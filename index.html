@@ -1753,7 +1753,6 @@ function setProgress(stage, done, total, curSymbol, forcedPct) {
   el.progressFill.style.width    = pct + '%';
   state.progressPercent = pct;
 
-  // Build informative sub-line
   if (_scanTimer.phase !== stage) {
     _scanTimer.startMs = Date.now();
     _scanTimer.phase   = stage;
@@ -1894,7 +1893,6 @@ let _usedWeight = 0;
 const WEIGHT_LIMIT = 2000;
 
 async function getJson(url, timeout = 14000) {
-  // Pause if approaching rate limit
   if (_usedWeight > WEIGHT_LIMIT * 0.85) {
     await new Promise(r => setTimeout(r, 2000));
   }
@@ -2121,7 +2119,6 @@ function ema(values, len) {
 }
 
 function detectFvg(candles, tf) {
-  // FIX: scale lookback with timeframe
   const lookbacks = { '5m': 35, '15m': 35, '1h': 60, '4h': 90, '1d': 120 };
   const lookback = lookbacks[tf] || 35;
   const lastClose = candles[candles.length - 1].close;
@@ -2140,7 +2137,6 @@ function detectFvg(candles, tf) {
 }
 
 function analyzeStructure(candles, tf) {
-  // Minimum candle guard
   if (!candles || candles.length < 60) return {
     last: candles?.[candles.length-1] || { close:0, open:0, high:0, low:0, volume:0 },
     atr: 0, pivots: { highs:[], lows:[] },
@@ -2151,7 +2147,6 @@ function analyzeStructure(candles, tf) {
     sweepLow: false, sweepHigh: false, displacement: false,
     volumeExpansion: 1, trend: 'Insufficient data',
     trendStrength: 0, structureEvent: 'Insufficient history', fvg: null,
-    // SMC additions
     bos: null, choch: null, mss: null, smcEvent: null,
     _insufficient: true
   };
@@ -2190,16 +2185,6 @@ function analyzeStructure(candles, tf) {
   const fvg = detectFvg(candles, tf);
   const trendStrength = a ? Math.abs(slope) / a : 0;
 
-  /* ═══════════════════════════════════════
-     SMC STRUCTURE ENGINE
-     BOS  — Break of Structure (continuation)
-     CHoCH — Change of Character (first sign of reversal after sweep)
-     MSS  — Market Structure Shift (confirmed reversal: sweep → CHoCH confirmed by BOS opposite)
-  ═══════════════════════════════════════ */
-
-  // BOS: current close breaks a prior swing (continuation of trend)
-  // Bullish BOS = close above previous swing high
-  // Bearish BOS = close below previous swing low
   let bos = null;
   if (lastHighs.length >= 2 && last.close > prevHigh.price) {
     bos = { direction: 'Bullish', level: prevHigh.price, type: 'BOS', label: 'BOS ↑' };
@@ -2207,24 +2192,17 @@ function analyzeStructure(candles, tf) {
     bos = { direction: 'Bearish', level: prevLow.price, type: 'BOS', label: 'BOS ↓' };
   }
 
-  // CHoCH: Change of Character
-  // After a BEARISH trend (lower highs, lower lows) → first bullish close above a prior swing HIGH = CHoCH Bullish
-  // After a BULLISH trend (higher highs, higher lows) → first bearish close below a prior swing LOW = CHoCH Bearish
-  // Key: CHoCH must happen AFTER a sweep (the liquidity grab that precedes the reversal)
   let choch = null;
   const recentBearish = lowerHighs && lowerLows;
   const recentBullish = higherHighs && higherLows;
 
   if (recentBearish && sweepLow && last.close > prevHigh.price) {
-    // Classic: downtrend → sweep SSL → close back above a swing high = CHoCH Bullish
     choch = { direction: 'Bullish', level: prevHigh.price, type: 'CHoCH',
       label: 'CHoCH ↑', trigger: 'SSL sweep + close above swing high' };
   } else if (recentBullish && sweepHigh && last.close < prevLow.price) {
-    // Classic: uptrend → sweep BSL → close back below a swing low = CHoCH Bearish
     choch = { direction: 'Bearish', level: prevLow.price, type: 'CHoCH',
       label: 'CHoCH ↓', trigger: 'BSL sweep + close below swing low' };
   } else if (recentBearish && last.close > recentHigh.price && !sweepLow) {
-    // Weaker CHoCH — no sweep, but close above most recent high in a downtrend
     choch = { direction: 'Bullish', level: recentHigh.price, type: 'CHoCH',
       label: 'CHoCH ↑ (weak)', trigger: 'Close above swing high in downtrend' };
   } else if (recentBullish && last.close < recentLow.price && !sweepHigh) {
@@ -2232,28 +2210,22 @@ function analyzeStructure(candles, tf) {
       label: 'CHoCH ↓ (weak)', trigger: 'Close below swing low in uptrend' };
   }
 
-  // MSS: Market Structure Shift — the CONFIRMED reversal
-  // Requires: (1) sweep of liquidity, (2) CHoCH candle, (3) subsequent BOS in the new direction
-  // We detect MSS by checking recent pivot history for the sequence: sweep → opposite BOS
   let mss = null;
   const lookback = candles.slice(-20);
   const sweepLowRecent  = lookback.some(c => c.low  < recentLow.price  && c.close > recentLow.price);
   const sweepHighRecent = lookback.slice(-12).some(c => c.high > recentHigh.price && c.close < recentHigh.price);
 
-  // Bullish MSS: recent sweep of sell-side + price now making higher high (confirmed structure flip)
   if (sweepLowRecent && higherHighs && last.close > prevHigh.price) {
     mss = { direction: 'Bullish', type: 'MSS',
       label: 'MSS ↑', confidence: choch ? 'High' : 'Medium',
       trigger: 'SSL swept → HH formed → structure flipped bullish' };
   }
-  // Bearish MSS: recent sweep of buy-side + price now making lower low
   if (sweepHighRecent && lowerLows && last.close < prevLow.price) {
     mss = { direction: 'Bearish', type: 'MSS',
       label: 'MSS ↓', confidence: choch ? 'High' : 'Medium',
       trigger: 'BSL swept → LL formed → structure flipped bearish' };
   }
 
-  // smcEvent: the most significant event (priority: MSS > CHoCH > BOS > sweep)
   let smcEvent = null;
   if (mss)        smcEvent = mss;
   else if (choch) smcEvent = choch;
@@ -2267,7 +2239,6 @@ function analyzeStructure(candles, tf) {
   if (bias === 'Bearish' && lowerHighs && lowerLows) trend = 'Clean downtrend';
   else if (bias === 'Bearish') trend = 'Bearish transition';
 
-  // structureEvent: use SMC event label when present, else basic label
   let structureEvent = 'Building range';
   if (mss)              structureEvent = mss.label;
   else if (choch)       structureEvent = choch.label;
@@ -2290,7 +2261,6 @@ function analyzeStructure(candles, tf) {
 function deriveDerivativesRule(row, tf) {
   const config    = tfMap[tf] || tfMap['15m'];
   const threshold = config.fundingThreshold;
-  // FIX: for 5m/15m, funding weight is reduced — only use it for extreme squeezes
   const fundingActive = !['5m','15m'].includes(tf) || Math.abs(row.funding) > threshold * 2;
   const oiUp   = row.oiChange > 0.002;
   const oiDown = row.oiChange < -0.002;
@@ -2311,7 +2281,7 @@ function deriveDerivativesRule(row, tf) {
 }
 
 /* ══════════════════════════════════════
-   DERIVE TRADE — with all bug fixes
+   DERIVE TRADE
 ══════════════════════════════════════ */
 function deriveTrade(row, primary, higherAnalyses, tf) {
   const htfBull  = higherAnalyses.filter(a => a.bias === 'Bullish').length;
@@ -2326,21 +2296,16 @@ function deriveTrade(row, primary, higherAnalyses, tf) {
   const crowdLong  = row.longShortRatio > 1.65;
   const crowdShort = row.longShortRatio > 0 && row.longShortRatio < 0.65;
 
-  // ── SMC-driven side determination ──────────────────────────────
-  // Priority order: MSS > CHoCH > derivatives rule > WAIT
-  // MSS is the highest confidence signal — structural flip confirmed
   let side = derivativesRule.actionSide;
   let smcOverride = false;
 
   if (primary.mss) {
-    // MSS overrides derivatives rule — structure has shifted
     if (primary.mss.direction === 'Bullish' && mtfBias !== 'Bearish') {
       side = 'LONG'; smcOverride = true;
     } else if (primary.mss.direction === 'Bearish' && mtfBias !== 'Bullish') {
       side = 'SHORT'; smcOverride = true;
     }
   } else if (primary.choch && !primary.choch.label.includes('weak')) {
-    // Strong CHoCH (sweep-confirmed) also overrides
     if (primary.choch.direction === 'Bullish' && mtfBias !== 'Bearish') {
       side = 'LONG'; smcOverride = true;
     } else if (primary.choch.direction === 'Bearish' && mtfBias !== 'Bullish') {
@@ -2348,7 +2313,6 @@ function deriveTrade(row, primary, higherAnalyses, tf) {
     }
   }
 
-  // Standard guards (apply even after SMC override)
   if (!smcOverride) {
     if (derivativesRule.actionSide === 'LONG'  && (mtfBias === 'Bearish') && !primary.sweepLow)  side = 'WAIT';
     if (derivativesRule.actionSide === 'SHORT' && (mtfBias === 'Bullish') && !primary.sweepHigh) side = 'WAIT';
@@ -2385,23 +2349,21 @@ function deriveTrade(row, primary, higherAnalyses, tf) {
     entry = NaN; stop = NaN; tp1 = NaN; tp2 = NaN; tp3 = NaN; rr = 0;
   }
 
-  // ── Scoring — SMC events carry significant weight ──────────────
   let score = 0;
   if (primary.bias !== 'Range') score += 15;
   if (mtfBias !== 'Mixed' && mtfBias !== 'Ranging' && mtfBias === primary.bias) score += 18;
   if (mtfBias === 'Ranging') score += 4;
 
-  // SMC event scoring — highest priority signals get most points
   if (primary.mss) {
-    score += primary.mss.confidence === 'High' ? 22 : 16;  // MSS = strongest signal
+    score += primary.mss.confidence === 'High' ? 22 : 16;
   } else if (primary.choch) {
     const isStrong = !primary.choch.label.includes('weak');
-    score += isStrong ? 16 : 8;   // CHoCH sweep-confirmed > weak CHoCH
+    score += isStrong ? 16 : 8;
   } else if (primary.bos) {
-    score += 8;                   // BOS alone = continuation, lower confidence
+    score += 8;
   }
 
-  if (primary.sweepLow || primary.sweepHigh) score += 10;  // sweep still scored (precursor)
+  if (primary.sweepLow || primary.sweepHigh) score += 10;
   const dispAligned = (side === 'LONG'  && primary.last?.close > primary.last?.open)
                    || (side === 'SHORT' && primary.last?.close < primary.last?.open);
   if (primary.displacement && dispAligned) score += 9;
@@ -2410,11 +2372,10 @@ function deriveTrade(row, primary, higherAnalyses, tf) {
   if (row.volume > 250000000) score += 5;
   if (derivativesRule.actionSide === 'LONG' || derivativesRule.actionSide === 'SHORT') score += 12;
   if ((side === 'SHORT' && crowdLong) || (side === 'LONG' && crowdShort)) score += 6;
-  if (smcOverride && side !== 'WAIT') score += 5;          // bonus for clean SMC trigger
+  if (smcOverride && side !== 'WAIT') score += 5;
   if (derivativesRule.skip) score = 0;
   score = clamp(Math.round(score), 0, 95);
 
-  // ── Reasons ────────────────────────────────────────────────────
   const reasons = [
     'Derivatives rule: ' + derivativesRule.scenario + ' = ' + derivativesRule.interpretation + ' | Trade chance: ' + derivativesRule.tradeChance,
     'Derivatives logic: ' + derivativesRule.marketLogic,
@@ -2423,7 +2384,6 @@ function deriveTrade(row, primary, higherAnalyses, tf) {
     'MTF bias: ' + mtfBias + ' from ' + higherAnalyses.map(a => a.interval + ' ' + a.bias).join(', ')
   ];
 
-  // SMC event reasons — most important, prepended
   if (primary.mss) {
     reasons.unshift('MSS (' + primary.mss.direction + ') confirmed · ' + primary.mss.trigger + ' · Confidence: ' + primary.mss.confidence);
   }
@@ -2483,7 +2443,6 @@ async function scanMarket() {
   _scanTimer.startMs = Date.now();
   _scanTimer.phase   = '';
   const tf = el.timeframe.value;
-  // FIX: save selected symbol to restore after scan
   const prevSelected = state.selected;
 
   state.rows = [];
@@ -2521,7 +2480,6 @@ async function scanMarket() {
     let done = 0;
     for (let ci = 0; ci < chunks.length; ci++) {
       const chunk = chunks[ci];
-      // Show the first symbol of each chunk so user sees live progress
       const curSym = chunk[0]?.symbol || '';
       setProgress('Analyzing chart structures', done, rows.length, curSym, 30 + (done / Math.max(rows.length, 1)) * 65);
       const results = await Promise.allSettled(chunk.map(r => analyzeRow(r, tf)));
@@ -2532,7 +2490,6 @@ async function scanMarket() {
       done += chunk.length;
       setProgress('Analyzing chart structures', done, rows.length, '', 30 + (done / Math.max(rows.length, 1)) * 65);
       setStatus('Analyzed ' + done + '/' + rows.length, 'live');
-      // Yield to UI every 2 chunks to avoid blocking paint
       if (ci % 2 === 1) await nextPaint();
     }
 
@@ -2547,7 +2504,6 @@ async function scanMarket() {
     renderRows(state.rows);
     renderMetrics(state.rows);
 
-    // FIX: re-select previously selected symbol if it still exists
     if (prevSelected) {
       const stillExists = state.rows.find(r => r.symbol === prevSelected);
       if (stillExists && stillExists.analysis) {
@@ -2556,7 +2512,6 @@ async function scanMarket() {
       }
     }
 
-    // Update tab count
     const validCount = state.rows.filter(r => r.score >= (Number(el.minScore.value) - 15)).length;
     el.scanCount.textContent = validCount;
     el.scanCount.classList.add('show');
@@ -2660,12 +2615,32 @@ function selectRow(symbol) {
 
 /* ══════════════════════════════════════
    RENDER DETAIL
-   FIX: accepts tf as explicit param — no longer reads market scan dropdown
+   ─────────────────────────────────────
+   FIX 1: levelCell is declared HERE at the TOP of the function,
+   before any use. Previously it was declared AFTER the
+   executionSection if/else block that already called it,
+   causing a TDZ ReferenceError ("Cannot access 'levelCell'
+   before initialisation") which crashed the drawer on every
+   market-scan row click.
+
+   FIX 2: In the WAIT diagnostic block, `bias` was referenced
+   as a bare variable (undefined). Corrected to `primary.bias`.
 ══════════════════════════════════════ */
 function renderDetail(row, targetEl, tf) {
   const { primary, higher, trade, candles } = row.analysis;
-  // tf is passed explicitly — fixes the bug where single coin showed market scanner TF
   const resolvedTf = tf || row._scanTf || el.timeframe.value;
+
+  /* ─── FIX 1: levelCell declared at top of function ─── */
+  const levelCell = (label, val, colorClass = '') => {
+    const display = fmtLevel(val);
+    const copyable = display !== '—';
+    return `<div class="level-cell">
+      <span class="level-lbl">${label}</span>
+      <span class="level-val${colorClass ? ' ' + colorClass : ''}">${display}</span>
+      ${copyable ? `<button class="level-copy" onclick="copyVal('${display}', this)" title="Copy">⎘</button>` : ''}
+    </div>`;
+  };
+
   const sideClass  = trade.side === 'LONG' ? 'b-buy' : trade.side === 'SHORT' ? 'b-sell' : 'b-wait';
   const fvgText    = primary.fvg ? primary.fvg.side + ' FVG · ' + fmtPrice(primary.fvg.low) + ' – ' + fmtPrice(primary.fvg.high) : 'None nearby';
   const dirWord    = trade.side === 'LONG' ? 'buy' : trade.side === 'SHORT' ? 'sell' : 'stand aside';
@@ -2683,38 +2658,32 @@ function renderDetail(row, targetEl, tf) {
   const arc = clamp((trade.score / 95) * circ, 0, circ);
   const ringColor = trade.score >= 65 ? '#00e676' : trade.score >= 45 ? '#ffd54f' : '#5a6470';
 
-  // Build the execution plan section — rich WAIT panel or normal trade ticket
+  // Build the execution plan section
   let executionSection = '';
 
   if (trade.side === 'WAIT') {
-    // Diagnose exactly what's missing
     const missingItems = [];
     const watchItems   = [];
     const htfLabels    = higher.map(a => a.interval + ' ' + a.bias).join(' · ');
 
-    // MTF conflict
     if (trade.mtfBias === 'Mixed') {
       missingItems.push('HTF bias is <b>conflicted</b> (' + htfLabels + ') — need alignment before any entry');
     } else if (trade.mtfBias === 'Ranging') {
       missingItems.push('Higher timeframes are <b>ranging</b> (' + htfLabels + ') — no directional edge yet');
     }
 
-    // Sweep missing
     if (!primary.sweepLow && !primary.sweepHigh) {
       missingItems.push('<b>No liquidity sweep</b> detected — price hasn\'t engineered a trap move yet');
     }
 
-    // Displacement missing
     if (!primary.displacement) {
       missingItems.push('<b>No displacement candle</b> — waiting for a strong, decisive move away from range');
     }
 
-    // Derivatives skip
     if (trade.derivativesRule.skip) {
       missingItems.push('Derivatives filter flagged <b>' + trade.derivativesRule.scenario + '</b> — setup is disqualified until conditions reset');
     }
 
-    // SMC missing items
     if (!primary.mss && !primary.choch) {
       missingItems.push('<b>No MSS or CHoCH</b> — structure has not shifted; no confirmed reversal signal yet');
     } else if (primary.choch && primary.choch.label.includes('weak')) {
@@ -2724,21 +2693,19 @@ function renderDetail(row, targetEl, tf) {
       missingItems.push('<b>No BOS</b> — no structural break in either direction to follow');
     }
 
-    // Structure is range
     if (primary.bias === 'Range') {
       missingItems.push('Market structure is in <b>equilibrium / range</b> — no clear bias to trade with');
     }
 
-    // What to watch for — SMC additions
     if (!primary.mss) {
       watchItems.push('MSS formation: sweep of liquidity → CHoCH candle → BOS in new direction = full structure shift');
     }
     if (!primary.choch || primary.choch.label.includes('weak')) {
-      const chochDir = bias === 'Bearish' ? 'bullish' : 'bearish';
+      /* ─── FIX 2: was `bias` (undefined) — corrected to `primary.bias` ─── */
+      const chochDir = primary.bias === 'Bearish' ? 'bullish' : 'bearish';
       watchItems.push('CHoCH trigger: a ' + chochDir + ' close beyond a prior swing after a liquidity sweep');
     }
 
-    // What to watch for
     if (!primary.sweepLow) {
       watchItems.push('SSL sweep: price dips below <b>' + fmtPrice(primary.recentLow.price) + '</b> then closes back above it');
     }
@@ -2841,16 +2808,6 @@ function renderDetail(row, targetEl, tf) {
       </div>
     </div>`;
   }
-
-  const levelCell = (label, val, colorClass = '') => {
-    const display = fmtLevel(val);
-    const copyable = display !== '—';
-    return `<div class="level-cell">
-      <span class="level-lbl">${label}</span>
-      <span class="level-val${colorClass ? ' ' + colorClass : ''}">${display}</span>
-      ${copyable ? `<button class="level-copy" onclick="copyVal('${display}', this)" title="Copy">⎘</button>` : ''}
-    </div>`;
-  };
 
   targetEl.innerHTML = `
     <div class="detail-meta">
@@ -2970,7 +2927,6 @@ function renderChart(candles, primary, trade, full) {
       <text x="${width-padR+4}" y="${y+4+(full?14:12)}" fill="${color}" font-family="JetBrains Mono,monospace" font-size="${full ? 10 : 8}" dominant-baseline="middle" opacity="0.7">${fmtPrice(price)}</text>`;
   };
 
-  // Y-axis labels
   const ySteps = 5;
   const yLabels = Array.from({length: ySteps}, (_, i) => {
     const price = max - (rng / (ySteps-1)) * i;
@@ -2992,7 +2948,6 @@ function renderChart(candles, primary, trade, full) {
 }
 
 function openFullChart() {
-  // Find current row — from drawer or single scan
   const symbol = state.selected || state._singleSymbol;
   if (!symbol) return;
   const row = state.rows.find(r => r.symbol === symbol) || state._singleRow;
@@ -3010,14 +2965,13 @@ function closeFullChart() {
 
 /* ══════════════════════════════════════
    SINGLE COIN SCAN
-   FIX: provider-aware + uses its own TF
 ══════════════════════════════════════ */
 async function runSingleScan() {
   if (state.singleBusy) return;
   const raw = el.singleInput.value.trim().toUpperCase().replace(/\s/g,'');
   if (!raw) { showSingleError('Enter a symbol first.'); return; }
   const symbol = (raw.includes('USDT') || raw.includes('USDC') || raw.includes('USD')) ? raw : raw + 'USDT';
-  const tf     = el.singleTf.value;   // ← uses its own dropdown, not market scan
+  const tf     = el.singleTf.value;
   const config = tfMap[tf];
 
   state.singleBusy = true;
@@ -3030,7 +2984,6 @@ async function runSingleScan() {
   try {
     showSingleProgress('Fetching ticker and derivatives data…');
 
-    // FIX: provider-aware routing — mirrors market scan logic
     let price = 0, volume = 0, change24h = 0, funding = 0;
     if (state.provider === 'bybit') {
       const bybitTicker = await safeJson(_EP.by + '/tickers?category=linear&symbol=' + symbol, { result: { list: [] } });
@@ -3111,14 +3064,13 @@ async function runSingleScan() {
     row.structureEvent = primary.structureEvent;
     row._scanTf      = tf;
 
-    // Store for fullscreen chart
     state._singleRow    = row;
     state._singleSymbol = symbol;
 
     el.singleResultTitle.textContent = symbol + ' · ' + config.label + ' · Score ' + trade.score;
     hideSingleProgress();
     el.singleResult.classList.add('active');
-    renderDetail(row, el.singleDetail, tf);   // ← passes tf explicitly
+    renderDetail(row, el.singleDetail, tf);
 
   } catch(e) {
     console.error(e);
@@ -3137,10 +3089,9 @@ function showSingleError(msg)    { el.singleError.textContent = msg; el.singleEr
 function hideSingleError()       { el.singleError.classList.remove('active'); el.singleError.textContent = ''; }
 
 /* ══════════════════════════════════════
-   EMA HELPER — full series for breakout detection
+   EMA HELPER
 ══════════════════════════════════════ */
 function ema50Series(candles) {
-  // Returns array of ema50 values, one per candle
   const k = 2 / (50 + 1);
   const result = [];
   let v = candles[0].close;
@@ -3166,24 +3117,21 @@ async function runEmaScan() {
   setEmaProgress('Fetching market universe…', 0, 0, '', 5);
 
   const windowDays = Number(el.emaWindow.value) || 7;
-  // cutoff: breakout must have first occurred within windowDays daily closes
   const cutoffMs = Date.now() - windowDays * 24 * 60 * 60 * 1000;
 
   try {
-    // Fetch market symbols (reuse provider logic)
     setEmaProgress('Fetching symbol list…', 0, 0, '', 8);
     let symbols = [];
     const quoteFilter = el.emaUniverse.value;
     const depth = el.emaDepth.value;
 
-    // Try Binance first, fall back to Bybit
     let provider = 'binance';
     try {
       const tickers = await getJson(_EP.bf + '/ticker/24hr');
       symbols = (Array.isArray(tickers) ? tickers : [])
         .filter(i => i.symbol && !i.symbol.includes('_'))
         .filter(i => quoteFilter === 'ALL' || i.symbol.endsWith(quoteFilter))
-        .filter(i => Number(i.quoteVolume) > 50000000) // min $50M daily vol — filter dust
+        .filter(i => Number(i.quoteVolume) > 50000000)
         .sort((a,b) => Number(b.quoteVolume) - Number(a.quoteVolume))
         .map(i => i.symbol);
     } catch(e) {
@@ -3201,7 +3149,6 @@ async function runEmaScan() {
 
     setEmaProgress('Scanning daily candles', 0, symbols.length, '', 10);
 
-    // Process in batches of 10
     const results = [];
     const batchSize = 10;
     let done = 0;
@@ -3214,7 +3161,6 @@ async function runEmaScan() {
 
       await Promise.allSettled(batch.map(async sym => {
         try {
-          // Fetch 60 daily candles — enough for 50 EMA + 7-day window check
           let candles;
           if (provider === 'bybit') {
             candles = await fetchBybitCandles(sym, '1d', 60);
@@ -3228,8 +3174,6 @@ async function runEmaScan() {
           const ema50 = ema50Series(candles);
           const n = candles.length;
 
-          // Find the first candle where close crossed above 50 EMA (from below)
-          // We look from bar n-windowDays-1 backward to find if there's a recent crossover
           let breakoutIdx = -1;
           for (let j = n - 1; j >= Math.max(1, n - windowDays - 2); j--) {
             const prevClose  = candles[j-1].close;
@@ -3239,33 +3183,26 @@ async function runEmaScan() {
             const crossedAbove = prevClose <= prevEma && currClose > currEma;
             if (crossedAbove) { breakoutIdx = j; break; }
           }
-          if (breakoutIdx < 0) return; // no crossover in window
+          if (breakoutIdx < 0) return;
 
-          // Check the breakout candle timestamp is within cutoff
           const breakoutTime = candles[breakoutIdx].time;
-          if (breakoutTime < cutoffMs) return; // too old
+          if (breakoutTime < cutoffMs) return;
 
-          // Count how many consecutive days since breakout the close stayed above EMA
           let holdDays = 0;
           for (let j = breakoutIdx; j < n; j++) {
             if (candles[j].close > ema50[j]) holdDays++;
-            else break; // closed back below — chain broken
+            else break;
           }
-          if (holdDays < 3) return; // must hold 3+ days
+          if (holdDays < 3) return;
 
-          // Quality metrics
           const last = candles[n - 1];
           const emaNow = ema50[n - 1];
           const abovePct = emaNow > 0 ? ((last.close - emaNow) / emaNow) * 100 : 0;
 
-          // Breakout candle volume vs 20-day avg — quality indicator
           const volAvg = sma(candles.slice(breakoutIdx - 20, breakoutIdx).map(c => c.volume), 20);
           const volMult = volAvg > 0 ? candles[breakoutIdx].volume / volAvg : 1;
 
-          // Pullback check: is price currently pulling back toward EMA (potential entry)?
-          const pullback = abovePct > 0 && abovePct < 4; // within 4% of EMA = possible retest
-
-          // ATR on daily for context
+          const pullback = abovePct > 0 && abovePct < 4;
           const dailyAtr = atr(candles.slice(-20));
 
           results.push({
@@ -3280,7 +3217,7 @@ async function runEmaScan() {
             volMult,
             pullback,
             dailyAtr,
-            volume: last.volume * last.close // approx daily vol in USD
+            volume: last.volume * last.close
           });
         } catch(e) { /* skip failed symbol silently */ }
       }));
@@ -3289,7 +3226,6 @@ async function runEmaScan() {
       if (i % 3 === 0) await nextPaint();
     }
 
-    // Sort: most recently broken + highest hold days first
     results.sort((a, b) => b.breakoutTime - a.breakoutTime || b.holdDays - a.holdDays);
 
     setEmaProgress('Scan complete', results.length, results.length, '', 100);
@@ -3326,11 +3262,9 @@ function setEmaProgress(stage, done, total, curSym, forcedPct) {
 }
 
 function renderEmaCards(results, totalScanned) {
-  // Update tab count badge
   el.emaCount.textContent = results.length;
   el.emaCount.classList.add('show');
 
-  // Stats strip
   el.emaScanCount.textContent  = totalScanned;
   el.emaFoundCount.textContent = results.length;
   const avgDays = results.length ? (results.reduce((s, r) => s + r.holdDays, 0) / results.length).toFixed(1) : '—';
@@ -3423,7 +3357,6 @@ el.refreshMins.addEventListener('change', () => { scheduleRefresh(); checkRefres
 el.scanDepth.addEventListener('change', checkRefreshWarning);
 el.timeframe.addEventListener('change', () => { if (state.rows.length) scanMarket(); });
 
-// FIX: full <tr> clickable — not just symbol button
 el.rows.addEventListener('click', e => {
   const tr = e.target.closest('tr[data-symbol]');
   if (tr) selectRow(tr.dataset.symbol);
@@ -3433,7 +3366,6 @@ el.modalClose.addEventListener('click', closeFullChart);
 el.chartModal.addEventListener('click', e => { if (e.target === el.chartModal) closeFullChart(); });
 window.addEventListener('keydown', e => {
   if (e.key === 'Escape') { closeFullChart(); closeDrawer(); }
-  // Keyboard navigation through pairs
   if ((e.key === 'ArrowDown' || e.key === 'ArrowUp') && state.rows.length) {
     e.preventDefault();
     const filtered = state.rows.filter(r => r.analysis);
