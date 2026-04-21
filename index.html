@@ -900,6 +900,141 @@
     .footer-logo span { color: var(--green); }
 
     /* ══════════════════════════════════════
+       EMA BREAKOUT WATCH TAB
+    ══════════════════════════════════════ */
+    .ema-wrap { padding: 0; }
+
+    .ema-controls {
+      display: flex; flex-wrap: wrap; gap: 0;
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* Empty state */
+    .ema-empty {
+      grid-column: 1 / -1;
+      display: flex; flex-direction: column; align-items: center;
+      padding: 60px 20px; text-align: center;
+    }
+    .ema-empty-icon {
+      font-size: 32px; color: var(--muted);
+      margin-bottom: 12px; opacity: 0.4;
+    }
+    .ema-empty-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700; font-size: 15px; color: var(--sub);
+      margin-bottom: 8px;
+    }
+    .ema-empty-sub {
+      font-size: 11px; color: var(--muted);
+      max-width: 420px; line-height: 1.65;
+    }
+
+    /* Card grid */
+    .ema-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      padding: 0;
+    }
+    @media (max-width: 600px) {
+      .ema-grid { grid-template-columns: 1fr; }
+    }
+
+    .ema-card {
+      background: var(--bg2);
+      padding: 0;
+      display: flex; flex-direction: column;
+      transition: background 150ms;
+      position: relative; overflow: hidden;
+    }
+    .ema-card:hover { background: var(--bg3); }
+
+    /* Strength stripe on left edge */
+    .ema-card::before {
+      content: '';
+      position: absolute; left: 0; top: 0; bottom: 0;
+      width: 3px;
+    }
+    .ema-card.strength-hot::before  { background: var(--green); box-shadow: 0 0 8px rgba(0,230,118,0.4); }
+    .ema-card.strength-warm::before { background: var(--gold); }
+    .ema-card.strength-cool::before { background: var(--cyan); }
+
+    .ema-card-head {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      padding: 12px 14px 8px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .ema-card-sym {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800; font-size: 17px;
+      color: var(--text); letter-spacing: -0.01em;
+      line-height: 1;
+    }
+    .ema-card-sym span {
+      font-size: 10px; font-weight: 500;
+      color: var(--muted); font-family: 'JetBrains Mono', monospace;
+    }
+
+    .ema-card-badges { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+
+    .ema-hold-badge {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700; font-size: 9px;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      padding: 3px 7px;
+      color: var(--green); background: var(--green-dim);
+      border: 1px solid var(--green-b);
+    }
+    .ema-days-lbl {
+      font-size: 9px; color: var(--muted);
+    }
+
+    .ema-card-body {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 1px; background: var(--border);
+      flex: 1;
+    }
+
+    .ema-stat-cell {
+      background: var(--bg2);
+      padding: 8px 11px;
+    }
+    .ema-card:hover .ema-stat-cell { background: var(--bg3); }
+
+    .ema-stat-lbl {
+      font-family: 'Syne', sans-serif;
+      font-size: 8px; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--muted); display: block; margin-bottom: 3px;
+    }
+    .ema-stat-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px; font-weight: 600;
+      color: var(--text); display: block;
+    }
+
+    .ema-card-foot {
+      padding: 8px 16px;
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+      font-size: 10px; color: var(--muted);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .ema-card:hover .ema-card-foot { background: var(--bg3); }
+
+    .ema-breakout-date { font-size: 10px; color: var(--sub); }
+    .ema-above-pct { font-weight: 600; }
+
+    /* Pullback alert */
+    .ema-pullback {
+      font-size: 9px; color: var(--gold);
+      font-weight: 600; letter-spacing: 0.04em;
+    }
+
+    /* ══════════════════════════════════════
        HOW TO USE — TECHNO ALERT BOX
     ══════════════════════════════════════ */
     .howto-box {
@@ -1015,6 +1150,10 @@
   </button>
   <button class="tab-btn" data-tab="single" onclick="switchTab('single')">
     Single Coin
+  </button>
+  <button class="tab-btn" data-tab="ema" onclick="switchTab('ema')">
+    EMA Watch
+    <span class="tab-count" id="emaCount">0</span>
   </button>
 </div>
 
@@ -1154,8 +1293,10 @@
         <span class="ctrl-lbl">Structure</span>
         <select id="structureFilter">
           <option value="ALL">All</option>
-          <option value="sweep">Sweeps</option>
+          <option value="CHoCH">CHoCH</option>
+          <option value="MSS">MSS</option>
           <option value="BOS">BOS</option>
+          <option value="sweep">Sweeps</option>
           <option value="range">Range</option>
         </select>
       </div>
@@ -1219,7 +1360,9 @@
         <div class="legend-item"><b>Funding</b><span>Negative = shorts paying longs. Positive = longs paying shorts.</span></div>
         <div class="legend-item"><b>OI</b><span>Rising = fresh positioning. Falling = deleveraging.</span></div>
         <div class="legend-item"><b>L/S</b><span>Long/short ratio. High = crowded longs. Low = crowded shorts.</span></div>
-        <div class="legend-item"><b>BOS</b><span>Break of structure — price breaks a recent swing high or low.</span></div>
+        <div class="legend-item"><b>MSS</b><span>Market Structure Shift — confirmed reversal: sweep of liquidity → CHoCH → BOS in new direction. Highest confidence signal.</span></div>
+        <div class="legend-item"><b>CHoCH</b><span>Change of Character — first close in the opposite direction through a prior swing, ideally after a sweep. Reversal warning.</span></div>
+        <div class="legend-item"><b>BOS</b><span>Break of Structure — price breaks a recent swing high or low. Continuation in trend direction.</span></div>
         <div class="legend-item"><b>Sweep</b><span>Liquidity grab: price trades beyond a level then closes back inside.</span></div>
         <div class="legend-item"><b>FVG</b><span>Fair value gap / imbalance. Used as entry or reaction zone.</span></div>
         <div class="legend-item"><b>BSL / SSL</b><span>Buy-side liquidity above swing highs. Sell-side below swing lows.</span></div>
@@ -1321,6 +1464,94 @@
     </div>
   </div><!-- /tab-single -->
 
+  <!-- ─── TAB: EMA BREAKOUT WATCH ─── -->
+  <div class="tab-pane" id="tab-ema">
+    <div class="ema-wrap">
+
+      <!-- Controls -->
+      <div class="ema-controls">
+        <div class="ctrl" style="flex:1; min-width:160px;">
+          <span class="ctrl-lbl">Universe</span>
+          <select id="emaUniverse">
+            <option value="USDT" selected>USDT Perps</option>
+            <option value="ALL">All Pairs</option>
+          </select>
+        </div>
+        <div class="ctrl" style="flex:1; min-width:160px;">
+          <span class="ctrl-lbl">Depth</span>
+          <select id="emaDepth">
+            <option value="ALL" selected>Full Market</option>
+            <option value="100">Top 100</option>
+            <option value="50">Top 50</option>
+          </select>
+        </div>
+        <div class="ctrl" style="flex:1; min-width:160px;">
+          <span class="ctrl-lbl">Breakout Window</span>
+          <select id="emaWindow">
+            <option value="7" selected>Last 7 days</option>
+            <option value="5">Last 5 days</option>
+            <option value="3">Last 3 days</option>
+          </select>
+        </div>
+        <div class="ctrl ctrl-scan" style="min-width:140px;">
+          <button id="emaScanBtn">Scan EMA →</button>
+        </div>
+      </div>
+
+      <!-- Info bar -->
+      <div class="warn-bar info active" id="emaInfoBar" style="display:block;">
+        <b>Daily 50 EMA Breakout Scanner</b> — Finds coins where the <b>daily close</b> crossed above the 50 EMA (not a wick) and has held for 3+ consecutive daily closes within your selected window. Fresh setups only.
+      </div>
+
+      <!-- Progress -->
+      <div class="progress-bar-wrap" id="emaProgressPanel">
+        <div class="progress-top">
+          <div class="progress-top-left">
+            <span class="progress-stage-main" id="emaProgressStage">—</span>
+            <span class="progress-sub" id="emaProgressSub"></span>
+          </div>
+          <span class="progress-pct" id="emaProgressPct">0%</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" id="emaProgressFill"></div>
+        </div>
+      </div>
+
+      <!-- Error bar -->
+      <div class="warn-bar error" id="emaErrorBox"></div>
+
+      <!-- Stats strip -->
+      <div class="stats-strip" id="emaStats" style="display:none;">
+        <div class="stat">
+          <span class="stat-lbl">Coins Scanned</span>
+          <span class="stat-val" id="emaScanCount">—</span>
+        </div>
+        <div class="stat">
+          <span class="stat-lbl">Breakouts Found</span>
+          <span class="stat-val" id="emaFoundCount" style="color:var(--green);">—</span>
+        </div>
+        <div class="stat">
+          <span class="stat-lbl">Avg Days Holding</span>
+          <span class="stat-val" id="emaAvgDays">—</span>
+        </div>
+        <div class="stat">
+          <span class="stat-lbl">Strongest</span>
+          <span class="stat-val" id="emaStrongest">—</span>
+        </div>
+      </div>
+
+      <!-- Card grid results -->
+      <div class="ema-grid" id="emaGrid">
+        <div class="ema-empty">
+          <div class="ema-empty-icon">◎</div>
+          <div class="ema-empty-title">EMA Breakout Watch</div>
+          <div class="ema-empty-sub">Scan to find coins that recently crossed and held the daily 50 EMA. Only fresh breakouts within your selected window will appear.</div>
+        </div>
+      </div>
+
+    </div>
+  </div><!-- /tab-ema -->
+
 </div><!-- /page-wrap -->
 
 <!-- ══════════════════════════════════════
@@ -1369,7 +1600,7 @@ const state = {
   timer: null, countdown: null, nextAt: 0,
   provider: 'binance',
   busy: false, progressPercent: 0,
-  singleBusy: false,
+  singleBusy: false, emaBusy: false,
   lastScanTime: null, lastScanTf: null,
   stalenessInterval: null
 };
@@ -1427,7 +1658,26 @@ const el = {
   singleError:     document.getElementById('singleError'),
   singleResult:    document.getElementById('singleResult'),
   singleResultTitle: document.getElementById('singleResultTitle'),
-  singleDetail:    document.getElementById('singleDetail')
+  singleDetail:    document.getElementById('singleDetail'),
+  // EMA Watch tab
+  emaScanBtn:      document.getElementById('emaScanBtn'),
+  emaUniverse:     document.getElementById('emaUniverse'),
+  emaDepth:        document.getElementById('emaDepth'),
+  emaWindow:       document.getElementById('emaWindow'),
+  emaProgressPanel:document.getElementById('emaProgressPanel'),
+  emaProgressStage:document.getElementById('emaProgressStage'),
+  emaProgressSub:  document.getElementById('emaProgressSub'),
+  emaProgressPct:  document.getElementById('emaProgressPct'),
+  emaProgressFill: document.getElementById('emaProgressFill'),
+  emaErrorBox:     document.getElementById('emaErrorBox'),
+  emaGrid:         document.getElementById('emaGrid'),
+  emaStats:        document.getElementById('emaStats'),
+  emaScanCount:    document.getElementById('emaScanCount'),
+  emaFoundCount:   document.getElementById('emaFoundCount'),
+  emaAvgDays:      document.getElementById('emaAvgDays'),
+  emaStrongest:    document.getElementById('emaStrongest'),
+  emaCount:        document.getElementById('emaCount'),
+  emaInfoBar:      document.getElementById('emaInfoBar')
 };
 
 /* CORS warning */
@@ -1581,7 +1831,8 @@ function openDrawer(row) {
   el.drawerTags.innerHTML =
     `<span class="badge ${sideClass}">${trade.side}</span>` +
     `<span class="badge b-info">${tfMap[tf] ? tfMap[tf].label : tf}</span>` +
-    `<span class="badge b-info">MTF: ${trade.mtfBias}</span>`;
+    `<span class="badge b-info">MTF: ${trade.mtfBias}</span>` +
+    (row.analysis.primary.smcEvent ? `<span class="badge ${row.analysis.primary.smcEvent.type === 'MSS' ? 'b-sell' : row.analysis.primary.smcEvent.direction === 'Bullish' ? 'b-buy' : 'b-sell'}" style="font-size:9px;">${row.analysis.primary.smcEvent.label}</span>` : '');
   renderDetail(row, el.drawerDetail, tf);
   el.drawer.classList.add('open');
   el.drawerBackdrop.classList.add('open');
@@ -1900,14 +2151,17 @@ function analyzeStructure(candles, tf) {
     sweepLow: false, sweepHigh: false, displacement: false,
     volumeExpansion: 1, trend: 'Insufficient data',
     trendStrength: 0, structureEvent: 'Insufficient history', fvg: null,
+    // SMC additions
+    bos: null, choch: null, mss: null, smcEvent: null,
     _insufficient: true
   };
+
   const closes = candles.map(c => c.close);
   const last   = candles[candles.length - 1];
   const a      = atr(candles);
   const pivots = findPivots(candles);
-  const lastHighs = pivots.highs.slice(-4);
-  const lastLows  = pivots.lows.slice(-4);
+  const lastHighs = pivots.highs.slice(-5);
+  const lastLows  = pivots.lows.slice(-5);
   const recentHigh = lastHighs[lastHighs.length - 1] || { price: Math.max(...candles.slice(-30).map(c => c.high)), index: candles.length - 1 };
   const recentLow  = lastLows[lastLows.length - 1]   || { price: Math.min(...candles.slice(-30).map(c => c.low)),  index: candles.length - 1 };
   const prevHigh = lastHighs[lastHighs.length - 2] || recentHigh;
@@ -1915,15 +2169,19 @@ function analyzeStructure(candles, tf) {
   const emaFast  = ema(closes, 21);
   const emaSlow  = ema(closes, 55);
   const slope    = emaFast - emaSlow;
+
   const brokeHigh = last.close > recentHigh.price;
   const brokeLow  = last.close < recentLow.price;
+
   const higherHighs = lastHighs.length >= 2 && lastHighs[lastHighs.length-1].price > lastHighs[lastHighs.length-2].price;
   const higherLows  = lastLows.length  >= 2 && lastLows[lastLows.length-1].price   > lastLows[lastLows.length-2].price;
   const lowerHighs  = lastHighs.length >= 2 && lastHighs[lastHighs.length-1].price < lastHighs[lastHighs.length-2].price;
   const lowerLows   = lastLows.length  >= 2 && lastLows[lastLows.length-1].price   < lastLows[lastLows.length-2].price;
+
   let bias = 'Range';
   if ((higherHighs && higherLows) || slope > a * 0.12 || brokeHigh) bias = 'Bullish';
   if ((lowerHighs  && lowerLows)  || slope < -a * 0.12 || brokeLow) bias = 'Bearish';
+
   const sweepLow  = candles.slice(-8).some(c => c.low  < recentLow.price  && c.close > recentLow.price);
   const sweepHigh = candles.slice(-8).some(c => c.high > recentHigh.price && c.close < recentHigh.price);
   const displacement  = Math.abs(last.close - last.open) > a * 0.65;
@@ -1931,18 +2189,99 @@ function analyzeStructure(candles, tf) {
   const volumeExpansion = volumeAvg ? last.volume / volumeAvg : 1;
   const fvg = detectFvg(candles, tf);
   const trendStrength = a ? Math.abs(slope) / a : 0;
+
+  /* ═══════════════════════════════════════
+     SMC STRUCTURE ENGINE
+     BOS  — Break of Structure (continuation)
+     CHoCH — Change of Character (first sign of reversal after sweep)
+     MSS  — Market Structure Shift (confirmed reversal: sweep → CHoCH confirmed by BOS opposite)
+  ═══════════════════════════════════════ */
+
+  // BOS: current close breaks a prior swing (continuation of trend)
+  // Bullish BOS = close above previous swing high
+  // Bearish BOS = close below previous swing low
+  let bos = null;
+  if (lastHighs.length >= 2 && last.close > prevHigh.price) {
+    bos = { direction: 'Bullish', level: prevHigh.price, type: 'BOS', label: 'BOS ↑' };
+  } else if (lastLows.length >= 2 && last.close < prevLow.price) {
+    bos = { direction: 'Bearish', level: prevLow.price, type: 'BOS', label: 'BOS ↓' };
+  }
+
+  // CHoCH: Change of Character
+  // After a BEARISH trend (lower highs, lower lows) → first bullish close above a prior swing HIGH = CHoCH Bullish
+  // After a BULLISH trend (higher highs, higher lows) → first bearish close below a prior swing LOW = CHoCH Bearish
+  // Key: CHoCH must happen AFTER a sweep (the liquidity grab that precedes the reversal)
+  let choch = null;
+  const recentBearish = lowerHighs && lowerLows;
+  const recentBullish = higherHighs && higherLows;
+
+  if (recentBearish && sweepLow && last.close > prevHigh.price) {
+    // Classic: downtrend → sweep SSL → close back above a swing high = CHoCH Bullish
+    choch = { direction: 'Bullish', level: prevHigh.price, type: 'CHoCH',
+      label: 'CHoCH ↑', trigger: 'SSL sweep + close above swing high' };
+  } else if (recentBullish && sweepHigh && last.close < prevLow.price) {
+    // Classic: uptrend → sweep BSL → close back below a swing low = CHoCH Bearish
+    choch = { direction: 'Bearish', level: prevLow.price, type: 'CHoCH',
+      label: 'CHoCH ↓', trigger: 'BSL sweep + close below swing low' };
+  } else if (recentBearish && last.close > recentHigh.price && !sweepLow) {
+    // Weaker CHoCH — no sweep, but close above most recent high in a downtrend
+    choch = { direction: 'Bullish', level: recentHigh.price, type: 'CHoCH',
+      label: 'CHoCH ↑ (weak)', trigger: 'Close above swing high in downtrend' };
+  } else if (recentBullish && last.close < recentLow.price && !sweepHigh) {
+    choch = { direction: 'Bearish', level: recentLow.price, type: 'CHoCH',
+      label: 'CHoCH ↓ (weak)', trigger: 'Close below swing low in uptrend' };
+  }
+
+  // MSS: Market Structure Shift — the CONFIRMED reversal
+  // Requires: (1) sweep of liquidity, (2) CHoCH candle, (3) subsequent BOS in the new direction
+  // We detect MSS by checking recent pivot history for the sequence: sweep → opposite BOS
+  let mss = null;
+  const lookback = candles.slice(-20);
+  const sweepLowRecent  = lookback.some(c => c.low  < recentLow.price  && c.close > recentLow.price);
+  const sweepHighRecent = lookback.slice(-12).some(c => c.high > recentHigh.price && c.close < recentHigh.price);
+
+  // Bullish MSS: recent sweep of sell-side + price now making higher high (confirmed structure flip)
+  if (sweepLowRecent && higherHighs && last.close > prevHigh.price) {
+    mss = { direction: 'Bullish', type: 'MSS',
+      label: 'MSS ↑', confidence: choch ? 'High' : 'Medium',
+      trigger: 'SSL swept → HH formed → structure flipped bullish' };
+  }
+  // Bearish MSS: recent sweep of buy-side + price now making lower low
+  if (sweepHighRecent && lowerLows && last.close < prevLow.price) {
+    mss = { direction: 'Bearish', type: 'MSS',
+      label: 'MSS ↓', confidence: choch ? 'High' : 'Medium',
+      trigger: 'BSL swept → LL formed → structure flipped bearish' };
+  }
+
+  // smcEvent: the most significant event (priority: MSS > CHoCH > BOS > sweep)
+  let smcEvent = null;
+  if (mss)        smcEvent = mss;
+  else if (choch) smcEvent = choch;
+  else if (bos)   smcEvent = bos;
+  else if (sweepHigh) smcEvent = { type: 'Sweep', direction: 'Bearish', label: 'BSL Sweep' };
+  else if (sweepLow)  smcEvent = { type: 'Sweep', direction: 'Bullish', label: 'SSL Sweep' };
+
   let trend = 'Range';
   if (bias === 'Bullish' && higherHighs && higherLows) trend = 'Clean uptrend';
   else if (bias === 'Bullish') trend = 'Bullish transition';
   if (bias === 'Bearish' && lowerHighs && lowerLows) trend = 'Clean downtrend';
   else if (bias === 'Bearish') trend = 'Bearish transition';
+
+  // structureEvent: use SMC event label when present, else basic label
   let structureEvent = 'Building range';
-  if (brokeHigh) structureEvent = 'BOS above resistance';
-  if (brokeLow)  structureEvent = 'BOS below support';
-  if (sweepLow)  structureEvent = 'Sell-side sweep';
-  if (sweepHigh) structureEvent = 'Buy-side sweep';
+  if (mss)              structureEvent = mss.label;
+  else if (choch)       structureEvent = choch.label;
+  else if (bos)         structureEvent = bos.label;
+  else if (sweepHigh)   structureEvent = 'BSL sweep';
+  else if (sweepLow)    structureEvent = 'SSL sweep';
+  else if (brokeHigh)   structureEvent = 'BOS above resistance';
+  else if (brokeLow)    structureEvent = 'BOS below support';
+
   return { last, atr: a, pivots, recentHigh, recentLow, prevHigh, prevLow, emaFast, emaSlow,
-    bias, brokeHigh, brokeLow, sweepLow, sweepHigh, displacement, volumeExpansion, trend, trendStrength, structureEvent, fvg };
+    bias, brokeHigh, brokeLow, sweepLow, sweepHigh, displacement, volumeExpansion,
+    trend, trendStrength, structureEvent, fvg,
+    bos, choch, mss, smcEvent,
+    higherHighs, higherLows, lowerHighs, lowerLows };
 }
 
 /* ══════════════════════════════════════
@@ -1975,11 +2314,10 @@ function deriveDerivativesRule(row, tf) {
    DERIVE TRADE — with all bug fixes
 ══════════════════════════════════════ */
 function deriveTrade(row, primary, higherAnalyses, tf) {
-  const htfBull = higherAnalyses.filter(a => a.bias === 'Bullish').length;
-  const htfBear = higherAnalyses.filter(a => a.bias === 'Bearish').length;
+  const htfBull  = higherAnalyses.filter(a => a.bias === 'Bullish').length;
+  const htfBear  = higherAnalyses.filter(a => a.bias === 'Bearish').length;
   const htfRange = higherAnalyses.filter(a => a.bias === 'Range').length;
-  // FIX: add 'Ranging' state — two Range readings ≠ Mixed conflict
-  const mtfBias = htfBull > htfBear ? 'Bullish'
+  const mtfBias  = htfBull > htfBear ? 'Bullish'
     : htfBear > htfBull ? 'Bearish'
     : htfRange === higherAnalyses.length ? 'Ranging'
     : 'Mixed';
@@ -1987,9 +2325,34 @@ function deriveTrade(row, primary, higherAnalyses, tf) {
   const derivativesRule = deriveDerivativesRule(row, tf);
   const crowdLong  = row.longShortRatio > 1.65;
   const crowdShort = row.longShortRatio > 0 && row.longShortRatio < 0.65;
+
+  // ── SMC-driven side determination ──────────────────────────────
+  // Priority order: MSS > CHoCH > derivatives rule > WAIT
+  // MSS is the highest confidence signal — structural flip confirmed
   let side = derivativesRule.actionSide;
-  if (derivativesRule.actionSide === 'LONG'  && (mtfBias === 'Bearish') && !primary.sweepLow)  side = 'WAIT';
-  if (derivativesRule.actionSide === 'SHORT' && (mtfBias === 'Bullish') && !primary.sweepHigh) side = 'WAIT';
+  let smcOverride = false;
+
+  if (primary.mss) {
+    // MSS overrides derivatives rule — structure has shifted
+    if (primary.mss.direction === 'Bullish' && mtfBias !== 'Bearish') {
+      side = 'LONG'; smcOverride = true;
+    } else if (primary.mss.direction === 'Bearish' && mtfBias !== 'Bullish') {
+      side = 'SHORT'; smcOverride = true;
+    }
+  } else if (primary.choch && !primary.choch.label.includes('weak')) {
+    // Strong CHoCH (sweep-confirmed) also overrides
+    if (primary.choch.direction === 'Bullish' && mtfBias !== 'Bearish') {
+      side = 'LONG'; smcOverride = true;
+    } else if (primary.choch.direction === 'Bearish' && mtfBias !== 'Bullish') {
+      side = 'SHORT'; smcOverride = true;
+    }
+  }
+
+  // Standard guards (apply even after SMC override)
+  if (!smcOverride) {
+    if (derivativesRule.actionSide === 'LONG'  && (mtfBias === 'Bearish') && !primary.sweepLow)  side = 'WAIT';
+    if (derivativesRule.actionSide === 'SHORT' && (mtfBias === 'Bullish') && !primary.sweepHigh) side = 'WAIT';
+  }
   if (derivativesRule.skip) side = 'WAIT';
 
   const price = primary.last?.close || row.price || 0;
@@ -2002,7 +2365,6 @@ function deriveTrade(row, primary, higherAnalyses, tf) {
     entry = clamp(fvgEntry, price - a * 1.45, price + a * 0.25);
     stop  = Math.min(primary.recentLow.price - a * 0.35, entry - a * 0.72);
     const risk = Math.max(entry - stop, a * 0.35, Number.EPSILON);
-    // FIX: guarantee 3 targets — fallback to R-multiples
     const rawTargets = [Math.max(primary.recentHigh.price, entry + risk * 1.1), entry + risk * 2.0, entry + risk * 3.0].filter(t => t > entry).sort((x,y) => x-y);
     tp1 = rawTargets[0] ?? entry + risk * 1.1;
     tp2 = rawTargets[1] ?? entry + risk * 2.0;
@@ -2014,7 +2376,6 @@ function deriveTrade(row, primary, higherAnalyses, tf) {
     entry = clamp(fvgEntry, price - a * 0.25, price + a * 1.45);
     stop  = Math.max(primary.recentHigh.price + a * 0.35, entry + a * 0.72);
     const risk = Math.max(stop - entry, a * 0.35, Number.EPSILON);
-    // FIX: guarantee 3 targets — fallback to R-multiples
     const rawTargets = [Math.min(primary.recentLow.price, entry - risk * 1.1), entry - risk * 2.0, entry - risk * 3.0].filter(t => t < entry).sort((x,y) => y-x);
     tp1 = rawTargets[0] ?? entry - risk * 1.1;
     tp2 = rawTargets[1] ?? entry - risk * 2.0;
@@ -2024,25 +2385,36 @@ function deriveTrade(row, primary, higherAnalyses, tf) {
     entry = NaN; stop = NaN; tp1 = NaN; tp2 = NaN; tp3 = NaN; rr = 0;
   }
 
-  // Score
+  // ── Scoring — SMC events carry significant weight ──────────────
   let score = 0;
-  if (primary.bias !== 'Range') score += 18;
-  if (mtfBias !== 'Mixed' && mtfBias !== 'Ranging' && mtfBias === primary.bias) score += 20;
-  if (mtfBias === 'Ranging') score += 5; // partial credit — not a conflict
-  if (primary.sweepLow || primary.sweepHigh) score += 12;
-  // FIX: displacement only scores when aligned with trade side
-  const dispAligned = (side === 'LONG' && primary.last?.close > primary.last?.open)
-    || (side === 'SHORT' && primary.last?.close < primary.last?.open);
-  if (primary.displacement && dispAligned) score += 10;
+  if (primary.bias !== 'Range') score += 15;
+  if (mtfBias !== 'Mixed' && mtfBias !== 'Ranging' && mtfBias === primary.bias) score += 18;
+  if (mtfBias === 'Ranging') score += 4;
+
+  // SMC event scoring — highest priority signals get most points
+  if (primary.mss) {
+    score += primary.mss.confidence === 'High' ? 22 : 16;  // MSS = strongest signal
+  } else if (primary.choch) {
+    const isStrong = !primary.choch.label.includes('weak');
+    score += isStrong ? 16 : 8;   // CHoCH sweep-confirmed > weak CHoCH
+  } else if (primary.bos) {
+    score += 8;                   // BOS alone = continuation, lower confidence
+  }
+
+  if (primary.sweepLow || primary.sweepHigh) score += 10;  // sweep still scored (precursor)
+  const dispAligned = (side === 'LONG'  && primary.last?.close > primary.last?.open)
+                   || (side === 'SHORT' && primary.last?.close < primary.last?.open);
+  if (primary.displacement && dispAligned) score += 9;
   if (primary.fvg) score += 8;
-  if (row.oiChange > 0.002) score += 9;
-  if (row.volume > 250000000) score += 6;
-  if (derivativesRule.actionSide === 'LONG' || derivativesRule.actionSide === 'SHORT') score += 15;
-  if ((side === 'SHORT' && crowdLong) || (side === 'LONG' && crowdShort)) score += 7;
+  if (row.oiChange > 0.002) score += 8;
+  if (row.volume > 250000000) score += 5;
+  if (derivativesRule.actionSide === 'LONG' || derivativesRule.actionSide === 'SHORT') score += 12;
+  if ((side === 'SHORT' && crowdLong) || (side === 'LONG' && crowdShort)) score += 6;
+  if (smcOverride && side !== 'WAIT') score += 5;          // bonus for clean SMC trigger
   if (derivativesRule.skip) score = 0;
-  // FIX: WAIT no longer hard-capped — let it score naturally
   score = clamp(Math.round(score), 0, 95);
 
+  // ── Reasons ────────────────────────────────────────────────────
   const reasons = [
     'Derivatives rule: ' + derivativesRule.scenario + ' = ' + derivativesRule.interpretation + ' | Trade chance: ' + derivativesRule.tradeChance,
     'Derivatives logic: ' + derivativesRule.marketLogic,
@@ -2050,22 +2422,35 @@ function deriveTrade(row, primary, higherAnalyses, tf) {
     'Trend state: ' + primary.trend + ' | Structure event: ' + primary.structureEvent,
     'MTF bias: ' + mtfBias + ' from ' + higherAnalyses.map(a => a.interval + ' ' + a.bias).join(', ')
   ];
-  if (primary.sweepLow)  reasons.push('Sell-side liquidity sweep detected near recent low');
-  if (primary.sweepHigh) reasons.push('Buy-side liquidity sweep detected near recent high');
-  if (primary.fvg)       reasons.push(primary.fvg.side + ' fair value gap nearby');
+
+  // SMC event reasons — most important, prepended
+  if (primary.mss) {
+    reasons.unshift('MSS (' + primary.mss.direction + ') confirmed · ' + primary.mss.trigger + ' · Confidence: ' + primary.mss.confidence);
+  }
+  if (primary.choch) {
+    reasons.unshift('CHoCH (' + primary.choch.direction + ') detected · ' + primary.choch.trigger);
+  }
+  if (primary.bos && !primary.mss && !primary.choch) {
+    reasons.push('BOS (' + primary.bos.direction + ') · Close through ' + fmtPrice(primary.bos.level) + ' — structure continuation');
+  }
+  if (primary.sweepLow)  reasons.push('Sell-side liquidity sweep near ' + fmtPrice(primary.recentLow.price));
+  if (primary.sweepHigh) reasons.push('Buy-side liquidity sweep near ' + fmtPrice(primary.recentHigh.price));
+  if (primary.fvg)       reasons.push(primary.fvg.side + ' fair value gap: ' + fmtPrice(primary.fvg.low) + '–' + fmtPrice(primary.fvg.high));
   if (row.oiChange > 0.002)  reasons.push('Open interest rising — fresh positioning entering');
   if (row.oiChange < -0.002) reasons.push('Open interest falling — deleveraging risk present');
   if (row.funding < 0) reasons.push('Negative funding: shorts paying longs');
   if (row.funding > 0) reasons.push('Positive funding: longs paying shorts');
   if (crowdLong)  reasons.push('Long-heavy crowd; watch for long liquidation traps');
   if (crowdShort) reasons.push('Short-heavy crowd; watch for short squeeze reversals');
+
   const invalidation = side === 'LONG'
     ? 'Invalidates on acceptance below sell-side liquidity and stop zone.'
     : side === 'SHORT'
       ? 'Invalidates on acceptance above buy-side liquidity and stop zone.'
-      : 'Wait for sweep, displacement candle, and aligned HTF bias.';
+      : 'No active setup — wait for MSS, CHoCH, or sweep with displacement.';
 
-  return { side, entry, stop, tp1, tp2, tp3, rr, score, mtfBias, derivativesRule, reasons, invalidation };
+  return { side, entry, stop, tp1, tp2, tp3, rr, score, mtfBias, derivativesRule,
+    reasons, invalidation, smcOverride };
 }
 
 /* ══════════════════════════════════════
@@ -2205,9 +2590,11 @@ function renderRows(rows) {
     if ((row.score || 0) < threshold - 15) return false;
     if (signal !== 'ALL' && row.side !== signal) return false;
     if (trend  !== 'ALL' && row.bias !== trend)  return false;
-    if (structure === 'sweep' && !String(row.structureEvent || '').includes('sweep')) return false;
-    if (structure === 'BOS'   && !String(row.structureEvent || '').includes('BOS'))   return false;
-    if (structure === 'range' && !String(row.structureEvent || '').includes('range')) return false;
+    if (structure === 'CHoCH'  && !String(row.structureEvent || '').includes('CHoCH'))  return false;
+    if (structure === 'MSS'    && !String(row.structureEvent || '').includes('MSS'))    return false;
+    if (structure === 'sweep'  && !String(row.structureEvent || '').toLowerCase().includes('sweep')) return false;
+    if (structure === 'BOS'    && !String(row.structureEvent || '').includes('BOS'))    return false;
+    if (structure === 'range'  && !String(row.structureEvent || '').includes('range'))  return false;
     if (funding === 'NEG' && !(row.funding < 0)) return false;
     if (funding === 'POS' && !(row.funding > 0)) return false;
     if (oi === 'RISING'  && !(row.oiChange > 0)) return false;
@@ -2327,9 +2714,28 @@ function renderDetail(row, targetEl, tf) {
       missingItems.push('Derivatives filter flagged <b>' + trade.derivativesRule.scenario + '</b> — setup is disqualified until conditions reset');
     }
 
+    // SMC missing items
+    if (!primary.mss && !primary.choch) {
+      missingItems.push('<b>No MSS or CHoCH</b> — structure has not shifted; no confirmed reversal signal yet');
+    } else if (primary.choch && primary.choch.label.includes('weak')) {
+      missingItems.push('CHoCH is <b>unconfirmed (weak)</b> — no sweep preceded it; wait for MSS to form');
+    }
+    if (!primary.bos && !primary.mss) {
+      missingItems.push('<b>No BOS</b> — no structural break in either direction to follow');
+    }
+
     // Structure is range
     if (primary.bias === 'Range') {
       missingItems.push('Market structure is in <b>equilibrium / range</b> — no clear bias to trade with');
+    }
+
+    // What to watch for — SMC additions
+    if (!primary.mss) {
+      watchItems.push('MSS formation: sweep of liquidity → CHoCH candle → BOS in new direction = full structure shift');
+    }
+    if (!primary.choch || primary.choch.label.includes('weak')) {
+      const chochDir = bias === 'Bearish' ? 'bullish' : 'bearish';
+      watchItems.push('CHoCH trigger: a ' + chochDir + ' close beyond a prior swing after a liquidity sweep');
     }
 
     // What to watch for
@@ -2731,6 +3137,262 @@ function showSingleError(msg)    { el.singleError.textContent = msg; el.singleEr
 function hideSingleError()       { el.singleError.classList.remove('active'); el.singleError.textContent = ''; }
 
 /* ══════════════════════════════════════
+   EMA HELPER — full series for breakout detection
+══════════════════════════════════════ */
+function ema50Series(candles) {
+  // Returns array of ema50 values, one per candle
+  const k = 2 / (50 + 1);
+  const result = [];
+  let v = candles[0].close;
+  for (let i = 0; i < candles.length; i++) {
+    v = candles[i].close * k + v * (1 - k);
+    result.push(v);
+  }
+  return result;
+}
+
+/* ══════════════════════════════════════
+   EMA SCAN ENGINE
+══════════════════════════════════════ */
+async function runEmaScan() {
+  if (state.emaBusy) return;
+  state.emaBusy = true;
+  el.emaScanBtn.disabled = true;
+  el.emaScanBtn.textContent = 'Scanning…';
+  el.emaErrorBox.classList.remove('active');
+  el.emaStats.style.display = 'none';
+  el.emaInfoBar.style.display = 'none';
+  el.emaGrid.innerHTML = '';
+  setEmaProgress('Fetching market universe…', 0, 0, '', 5);
+
+  const windowDays = Number(el.emaWindow.value) || 7;
+  // cutoff: breakout must have first occurred within windowDays daily closes
+  const cutoffMs = Date.now() - windowDays * 24 * 60 * 60 * 1000;
+
+  try {
+    // Fetch market symbols (reuse provider logic)
+    setEmaProgress('Fetching symbol list…', 0, 0, '', 8);
+    let symbols = [];
+    const quoteFilter = el.emaUniverse.value;
+    const depth = el.emaDepth.value;
+
+    // Try Binance first, fall back to Bybit
+    let provider = 'binance';
+    try {
+      const tickers = await getJson(_EP.bf + '/ticker/24hr');
+      symbols = (Array.isArray(tickers) ? tickers : [])
+        .filter(i => i.symbol && !i.symbol.includes('_'))
+        .filter(i => quoteFilter === 'ALL' || i.symbol.endsWith(quoteFilter))
+        .filter(i => Number(i.quoteVolume) > 50000000) // min $50M daily vol — filter dust
+        .sort((a,b) => Number(b.quoteVolume) - Number(a.quoteVolume))
+        .map(i => i.symbol);
+    } catch(e) {
+      provider = 'bybit';
+      const bybitTickers = await safeJson(_EP.by + '/tickers?category=linear', { result: { list: [] } });
+      symbols = (bybitTickers?.result?.list || [])
+        .filter(i => quoteFilter === 'ALL' || normalizeSymbol(i.symbol).endsWith(quoteFilter))
+        .filter(i => Number(i.turnover24h || 0) > 50000000)
+        .sort((a,b) => Number(b.turnover24h) - Number(a.turnover24h))
+        .map(i => normalizeSymbol(i.symbol));
+    }
+
+    const maxDepth = depth === 'ALL' ? symbols.length : Number(depth);
+    symbols = symbols.slice(0, maxDepth);
+
+    setEmaProgress('Scanning daily candles', 0, symbols.length, '', 10);
+
+    // Process in batches of 10
+    const results = [];
+    const batchSize = 10;
+    let done = 0;
+
+    for (let i = 0; i < symbols.length; i += batchSize) {
+      const batch = symbols.slice(i, i + batchSize);
+      const curSym = batch[0] || '';
+      setEmaProgress('Scanning daily candles', done, symbols.length, curSym,
+        10 + (done / Math.max(symbols.length,1)) * 85);
+
+      await Promise.allSettled(batch.map(async sym => {
+        try {
+          // Fetch 60 daily candles — enough for 50 EMA + 7-day window check
+          let candles;
+          if (provider === 'bybit') {
+            candles = await fetchBybitCandles(sym, '1d', 60);
+          } else {
+            const raw = await safeJson(_EP.bf + '/klines?symbol=' + sym + '&interval=1d&limit=60', null);
+            if (!raw || !raw.length) return;
+            candles = raw.map(c => ({ time: +c[0], open: +c[1], high: +c[2], low: +c[3], close: +c[4], volume: +c[5] }));
+          }
+          if (!candles || candles.length < 55) return;
+
+          const ema50 = ema50Series(candles);
+          const n = candles.length;
+
+          // Find the first candle where close crossed above 50 EMA (from below)
+          // We look from bar n-windowDays-1 backward to find if there's a recent crossover
+          let breakoutIdx = -1;
+          for (let j = n - 1; j >= Math.max(1, n - windowDays - 2); j--) {
+            const prevClose  = candles[j-1].close;
+            const prevEma    = ema50[j-1];
+            const currClose  = candles[j].close;
+            const currEma    = ema50[j];
+            const crossedAbove = prevClose <= prevEma && currClose > currEma;
+            if (crossedAbove) { breakoutIdx = j; break; }
+          }
+          if (breakoutIdx < 0) return; // no crossover in window
+
+          // Check the breakout candle timestamp is within cutoff
+          const breakoutTime = candles[breakoutIdx].time;
+          if (breakoutTime < cutoffMs) return; // too old
+
+          // Count how many consecutive days since breakout the close stayed above EMA
+          let holdDays = 0;
+          for (let j = breakoutIdx; j < n; j++) {
+            if (candles[j].close > ema50[j]) holdDays++;
+            else break; // closed back below — chain broken
+          }
+          if (holdDays < 3) return; // must hold 3+ days
+
+          // Quality metrics
+          const last = candles[n - 1];
+          const emaNow = ema50[n - 1];
+          const abovePct = emaNow > 0 ? ((last.close - emaNow) / emaNow) * 100 : 0;
+
+          // Breakout candle volume vs 20-day avg — quality indicator
+          const volAvg = sma(candles.slice(breakoutIdx - 20, breakoutIdx).map(c => c.volume), 20);
+          const volMult = volAvg > 0 ? candles[breakoutIdx].volume / volAvg : 1;
+
+          // Pullback check: is price currently pulling back toward EMA (potential entry)?
+          const pullback = abovePct > 0 && abovePct < 4; // within 4% of EMA = possible retest
+
+          // ATR on daily for context
+          const dailyAtr = atr(candles.slice(-20));
+
+          results.push({
+            symbol: sym,
+            base: baseSymbol(sym),
+            price: last.close,
+            emaVal: emaNow,
+            abovePct,
+            holdDays,
+            breakoutTime,
+            breakoutClose: candles[breakoutIdx].close,
+            volMult,
+            pullback,
+            dailyAtr,
+            volume: last.volume * last.close // approx daily vol in USD
+          });
+        } catch(e) { /* skip failed symbol silently */ }
+      }));
+
+      done += batch.length;
+      if (i % 3 === 0) await nextPaint();
+    }
+
+    // Sort: most recently broken + highest hold days first
+    results.sort((a, b) => b.breakoutTime - a.breakoutTime || b.holdDays - a.holdDays);
+
+    setEmaProgress('Scan complete', results.length, results.length, '', 100);
+    renderEmaCards(results, symbols.length);
+
+  } catch(e) {
+    console.error(e);
+    el.emaErrorBox.textContent = 'EMA scan error: ' + e.message;
+    el.emaErrorBox.classList.add('active');
+    setEmaProgress('—', 0, 0, '', 0);
+    el.emaProgressPanel.classList.remove('active');
+  } finally {
+    state.emaBusy = false;
+    el.emaScanBtn.disabled = false;
+    el.emaScanBtn.textContent = 'Scan EMA →';
+  }
+}
+
+function setEmaProgress(stage, done, total, curSym, forcedPct) {
+  const safeTotal = Math.max(Number(total) || 0, 0);
+  const safeDone  = Math.max(Number(done)  || 0, 0);
+  const pct = Number.isFinite(forcedPct) ? clamp(Math.round(forcedPct), 0, 100)
+    : safeTotal ? clamp(Math.round((safeDone / safeTotal) * 100), 0, 100) : 0;
+  el.emaProgressPanel.classList.add('active');
+  el.emaProgressStage.textContent = stage;
+  el.emaProgressPct.textContent   = pct + '%';
+  el.emaProgressFill.style.width  = pct + '%';
+  let sub = '';
+  if (safeTotal > 0 && safeDone > 0) {
+    sub = safeDone + ' / ' + safeTotal + ' coins';
+    if (curSym) sub += ' &nbsp;·&nbsp; <span class="ps-symbol">' + curSym.replace('USDT','') + '</span>';
+  }
+  el.emaProgressSub.innerHTML = sub;
+}
+
+function renderEmaCards(results, totalScanned) {
+  // Update tab count badge
+  el.emaCount.textContent = results.length;
+  el.emaCount.classList.add('show');
+
+  // Stats strip
+  el.emaScanCount.textContent  = totalScanned;
+  el.emaFoundCount.textContent = results.length;
+  const avgDays = results.length ? (results.reduce((s, r) => s + r.holdDays, 0) / results.length).toFixed(1) : '—';
+  el.emaAvgDays.textContent = avgDays;
+  const strongest = results.reduce((best, r) => (!best || r.abovePct > best.abovePct) ? r : best, null);
+  el.emaStrongest.textContent = strongest ? strongest.base : '—';
+  el.emaStats.style.display = 'grid';
+
+  if (!results.length) {
+    el.emaGrid.innerHTML = `<div class="ema-empty" style="grid-column:1/-1;">
+      <div class="ema-empty-icon">○</div>
+      <div class="ema-empty-title">No Breakouts Found</div>
+      <div class="ema-empty-sub">No coins crossed and held the daily 50 EMA within the selected ${el.emaWindow.value}-day window. Try extending the window or scanning more pairs.</div>
+    </div>`;
+    return;
+  }
+
+  el.emaGrid.innerHTML = results.map(r => {
+    const strengthClass = r.abovePct > 8 ? 'strength-hot' : r.abovePct > 3 ? 'strength-warm' : 'strength-cool';
+    const dateStr = new Date(r.breakoutTime).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+    const daysAgo = Math.round((Date.now() - r.breakoutTime) / 86400000);
+    const aboveCol = r.abovePct > 8 ? 'var(--green)' : r.abovePct > 3 ? 'var(--gold)' : 'var(--cyan)';
+    const volLabel = r.volMult >= 2 ? '🔥 ' + r.volMult.toFixed(1) + 'x avg' : r.volMult >= 1.3 ? r.volMult.toFixed(1) + 'x avg' : 'Normal';
+
+    return `<div class="ema-card ${strengthClass}">
+      <div class="ema-card-head">
+        <div>
+          <div class="ema-card-sym">${r.base}<span>USDT</span></div>
+          <div style="font-size:10px; color:var(--muted); margin-top:3px;">${fmtPrice(r.price)}</div>
+        </div>
+        <div class="ema-card-badges">
+          <span class="ema-hold-badge">${r.holdDays}D HOLD</span>
+          <span class="ema-days-lbl">${daysAgo === 0 ? 'today' : daysAgo + 'd ago'}</span>
+        </div>
+      </div>
+      <div class="ema-card-body">
+        <div class="ema-stat-cell">
+          <span class="ema-stat-lbl">50 EMA</span>
+          <span class="ema-stat-val">${fmtPrice(r.emaVal)}</span>
+        </div>
+        <div class="ema-stat-cell">
+          <span class="ema-stat-lbl">Above EMA</span>
+          <span class="ema-stat-val" style="color:${aboveCol};">+${r.abovePct.toFixed(2)}%</span>
+        </div>
+        <div class="ema-stat-cell">
+          <span class="ema-stat-lbl">Vol on Break</span>
+          <span class="ema-stat-val" style="color:${r.volMult >= 2 ? 'var(--green)' : 'var(--text)'};">${volLabel}</span>
+        </div>
+        <div class="ema-stat-cell">
+          <span class="ema-stat-lbl">Daily ATR</span>
+          <span class="ema-stat-val">${fmtPrice(r.dailyAtr)}</span>
+        </div>
+      </div>
+      <div class="ema-card-foot">
+        <span class="ema-breakout-date">Crossed: ${dateStr}</span>
+        ${r.pullback ? '<span class="ema-pullback">⟳ Near EMA — possible entry</span>' : '<span style="color:var(--muted);font-size:9px;">Holding above</span>'}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ══════════════════════════════════════
    AUTO-REFRESH
 ══════════════════════════════════════ */
 function scheduleRefresh() {
@@ -2788,6 +3450,7 @@ window.addEventListener('beforeunload', () => {
 el.singleScanBtn.addEventListener('click', runSingleScan);
 el.singleInput.addEventListener('keydown', e => { if (e.key === 'Enter') runSingleScan(); });
 el.singleInput.addEventListener('input', () => { el.singleInput.value = el.singleInput.value.toUpperCase(); });
+el.emaScanBtn.addEventListener('click', runEmaScan);
 </script>
 </body>
 </html>
