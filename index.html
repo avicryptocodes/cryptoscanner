@@ -1180,6 +1180,7 @@
             <option value="1h">1h Swing</option>
             <option value="4h">4h Position</option>
             <option value="1d">1D Macro</option>
+            <option value="1w">1W Weekly</option>
           </select>
         </div>
         <div class="ctrl">
@@ -1443,6 +1444,7 @@
               <option value="1h">1h Swing</option>
               <option value="4h">4h Position</option>
               <option value="1d">1D Macro</option>
+              <option value="1w">1W Weekly</option>
             </select>
           </div>
           <div class="single-scan-btn-wrap">
@@ -1691,7 +1693,8 @@ const tfMap = {
   '15m': { higher: ['1h','4h'],   limit: 180, label: '15m Intraday', oiPeriod: '15m', oiLimit: 3, lsPeriod: '15m', lsLimit: 3, fundingThreshold: 0.00030, staleMs: 15*60000 },
   '1h':  { higher: ['4h','1d'],   limit: 180, label: '1h Swing',     oiPeriod: '1h',  oiLimit: 3, lsPeriod: '1h',  lsLimit: 3, fundingThreshold: 0.00035, staleMs: 60*60000 },
   '4h':  { higher: ['1d','1w'],   limit: 180, label: '4h Position',  oiPeriod: '4h',  oiLimit: 3, lsPeriod: '4h',  lsLimit: 3, fundingThreshold: 0.00050, staleMs: 4*60*60000 },
-  '1d':  { higher: ['1w'],        limit: 220, label: '1D Macro',     oiPeriod: '1d',  oiLimit: 3, lsPeriod: '1d',  lsLimit: 3, fundingThreshold: 0.00075, staleMs: 24*60*60000 }
+  '1d':  { higher: ['1w'],        limit: 220, label: '1D Macro',     oiPeriod: '1d',  oiLimit: 3, lsPeriod: '1d',  lsLimit: 3, fundingThreshold: 0.00075, staleMs: 24*60*60000 },
+  '1w':  { higher: [],           limit: 52,  label: '1W Weekly',    oiPeriod: '1d',  oiLimit: 3, lsPeriod: '1d',  lsLimit: 3, fundingThreshold: 0.00100, staleMs: 7*24*60*60000 }
 };
 
 const bybitIntervals = { '5m':'5','15m':'15','1h':'60','4h':'240','1d':'D','1w':'W' };
