@@ -63,9 +63,6 @@
     select { -webkit-appearance: none; appearance: none; }
     select option { background: var(--bg3); color: var(--text); }
 
-    /* ══════════════════════════════════════
-       NAV
-    ══════════════════════════════════════ */
     .nav {
       position: fixed; top: 0; left: 0; right: 0;
       z-index: 300;
@@ -106,12 +103,6 @@
     #lastScan.stale-warn { color: var(--gold); }
     #lastScan.stale-crit { color: var(--red); }
 
-    /* ══════════════════════════════════════
-       TABS  — each tab has its own color
-       Market Scan  → cyan   (#40c4ff)
-       Single Coin  → gold   (#ffd54f)
-       EMA Watch    → violet (#c87eff)
-    ══════════════════════════════════════ */
     :root {
       --tab-market: #40c4ff;
       --tab-market-dim: rgba(64,196,255,0.10);
@@ -150,7 +141,6 @@
     }
     .tab-btn:last-child { border-right: none; }
 
-    /* Tab icon */
     .tab-icon {
       font-size: 13px;
       opacity: 0.5;
@@ -158,46 +148,21 @@
       flex-shrink: 0;
     }
 
-    /* ── Market Scan (cyan) ── */
-    .tab-btn[data-tab="market"]:hover:not(.active) {
-      color: var(--tab-market);
-      background: var(--tab-market-dim);
-    }
+    .tab-btn[data-tab="market"]:hover:not(.active) { color: var(--tab-market); background: var(--tab-market-dim); }
     .tab-btn[data-tab="market"]:hover:not(.active) .tab-icon { opacity: 0.8; }
-    .tab-btn[data-tab="market"].active {
-      color: var(--tab-market);
-      border-bottom-color: var(--tab-market);
-      background: var(--tab-market-dim);
-    }
+    .tab-btn[data-tab="market"].active { color: var(--tab-market); border-bottom-color: var(--tab-market); background: var(--tab-market-dim); }
     .tab-btn[data-tab="market"].active .tab-icon { opacity: 1; transform: scale(1.1); }
 
-    /* ── Single Coin (gold) ── */
-    .tab-btn[data-tab="single"]:hover:not(.active) {
-      color: var(--tab-single);
-      background: var(--tab-single-dim);
-    }
+    .tab-btn[data-tab="single"]:hover:not(.active) { color: var(--tab-single); background: var(--tab-single-dim); }
     .tab-btn[data-tab="single"]:hover:not(.active) .tab-icon { opacity: 0.8; }
-    .tab-btn[data-tab="single"].active {
-      color: var(--tab-single);
-      border-bottom-color: var(--tab-single);
-      background: var(--tab-single-dim);
-    }
+    .tab-btn[data-tab="single"].active { color: var(--tab-single); border-bottom-color: var(--tab-single); background: var(--tab-single-dim); }
     .tab-btn[data-tab="single"].active .tab-icon { opacity: 1; transform: scale(1.1); }
 
-    /* ── EMA Watch (violet) ── */
-    .tab-btn[data-tab="ema"]:hover:not(.active) {
-      color: var(--tab-ema);
-      background: var(--tab-ema-dim);
-    }
+    .tab-btn[data-tab="ema"]:hover:not(.active) { color: var(--tab-ema); background: var(--tab-ema-dim); }
     .tab-btn[data-tab="ema"]:hover:not(.active) .tab-icon { opacity: 0.8; }
-    .tab-btn[data-tab="ema"].active {
-      color: var(--tab-ema);
-      border-bottom-color: var(--tab-ema);
-      background: var(--tab-ema-dim);
-    }
+    .tab-btn[data-tab="ema"].active { color: var(--tab-ema); border-bottom-color: var(--tab-ema); background: var(--tab-ema-dim); }
     .tab-btn[data-tab="ema"].active .tab-icon { opacity: 1; transform: scale(1.1); }
 
-    /* Tab count badge — inherits tab color */
     .tab-count {
       font-family: 'JetBrains Mono', monospace;
       font-weight: 700; font-size: 9px;
@@ -207,20 +172,9 @@
       line-height: 1.4;
     }
     .tab-count.show { display: inline-flex; }
-    .tab-btn[data-tab="market"] .tab-count {
-      color: var(--tab-market);
-      background: var(--tab-market-dim);
-      border-color: var(--tab-market-b);
-    }
-    .tab-btn[data-tab="ema"] .tab-count {
-      color: var(--tab-ema);
-      background: var(--tab-ema-dim);
-      border-color: var(--tab-ema-b);
-    }
+    .tab-btn[data-tab="market"] .tab-count { color: var(--tab-market); background: var(--tab-market-dim); border-color: var(--tab-market-b); }
+    .tab-btn[data-tab="ema"] .tab-count { color: var(--tab-ema); background: var(--tab-ema-dim); border-color: var(--tab-ema-b); }
 
-    /* ══════════════════════════════════════
-       PAGE BODY
-    ══════════════════════════════════════ */
     .page-wrap {
       padding-top: calc(var(--nav-h) + var(--tab-h));
       min-height: 100dvh;
@@ -229,9 +183,6 @@
     .tab-pane { display: none; }
     .tab-pane.active { display: block; }
 
-    /* ══════════════════════════════════════
-       CONTROLS STRIP
-    ══════════════════════════════════════ */
     .controls-strip {
       background: var(--bg2);
       border-bottom: 1px solid var(--border);
@@ -289,7 +240,6 @@
     .ctrl-scan button:hover::after { transform: translateX(100%); }
     .ctrl-scan button:disabled { opacity: 0.5; cursor: wait; }
 
-    /* Mobile controls: collapse into filter button */
     .controls-toggle {
       display: none;
       width: 100%;
@@ -304,9 +254,6 @@
     .controls-toggle-arrow { transition: transform 200ms; }
     .controls-toggle.open .controls-toggle-arrow { transform: rotate(180deg); }
 
-    /* ══════════════════════════════════════
-       STATS ROW
-    ══════════════════════════════════════ */
     .stats-strip {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -335,9 +282,6 @@
 
     .stat-val .accent { color: var(--green); font-size: 11px; font-weight: 600; margin-left: 4px; }
 
-    /* ══════════════════════════════════════
-       PROGRESS
-    ══════════════════════════════════════ */
     .progress-bar-wrap {
       display: none; background: var(--bg2);
       border-bottom: 1px solid var(--border);
@@ -369,9 +313,6 @@
       transition: width 180ms ease;
     }
 
-    /* ══════════════════════════════════════
-       CORS / ERROR / WARNINGS
-    ══════════════════════════════════════ */
     .warn-bar {
       display: none;
       padding: 10px 14px;
@@ -384,9 +325,6 @@
     .warn-bar.info  { color: var(--cyan); border-color: rgba(64,196,255,0.15); background: var(--cyan-dim); }
     .warn-bar b { font-weight: 600; }
 
-    /* ══════════════════════════════════════
-       RESULT FILTERS
-    ══════════════════════════════════════ */
     .result-filters {
       display: flex; flex-wrap: wrap; gap: 0;
       background: var(--bg2);
@@ -404,7 +342,6 @@
     .rf .ctrl-lbl { margin-bottom: 3px; }
     .rf select { font-size: 11px; color: var(--text); width: 100%; }
 
-    /* Search */
     .search-wrap {
       padding: 8px 12px;
       border-bottom: 1px solid var(--border);
@@ -418,9 +355,6 @@
     .search-wrap input::placeholder { color: var(--muted); }
     .search-icon { color: var(--muted); font-size: 12px; flex-shrink: 0; }
 
-    /* ══════════════════════════════════════
-       SCANNER TABLE
-    ══════════════════════════════════════ */
     .table-wrap {
       overflow-x: auto;
       -webkit-overflow-scrolling: touch;
@@ -453,20 +387,12 @@
     tbody tr.active td:first-child { padding-left: 9px; }
     .skip-row td { opacity: 0.4; }
 
-    /* hide less-important columns on narrow screens */
-    @media (max-width: 680px) {
-      .col-vol, .col-oi, .col-ls, .col-trend, .col-bias { display: none; }
-    }
-    @media (max-width: 480px) {
-      .col-change { display: none; }
-    }
+    @media (max-width: 680px) { .col-vol, .col-oi, .col-ls, .col-trend, .col-bias { display: none; } }
+    @media (max-width: 480px) { .col-change { display: none; } }
 
     .sym { font-weight: 700; font-size: 12px; color: var(--text); }
     tbody tr.active .sym { color: var(--green); }
 
-    /* ══════════════════════════════════════
-       BADGES
-    ══════════════════════════════════════ */
     .badge {
       display: inline-flex; align-items: center;
       padding: 3px 7px;
@@ -490,12 +416,8 @@
     .score-mid  { color: var(--gold); }
     .score-low  { color: var(--muted); }
 
-    /* Empty state */
     .empty-row td { padding: 32px; text-align: center; color: var(--muted); font-size: 12px; }
 
-    /* ══════════════════════════════════════
-       DETAIL DRAWER / BOTTOM SHEET
-    ══════════════════════════════════════ */
     .drawer-backdrop {
       position: fixed; inset: 0;
       background: rgba(0,0,0,0.6);
@@ -505,7 +427,6 @@
     }
     .drawer-backdrop.open { opacity: 1; pointer-events: all; }
 
-    /* Desktop: right drawer */
     .drawer {
       position: fixed;
       top: 0; right: 0; bottom: 0;
@@ -520,7 +441,6 @@
     }
     .drawer.open { transform: translateX(0); }
 
-    /* Mobile: bottom sheet */
     @media (max-width: 768px) {
       .drawer {
         top: auto; left: 0; right: 0;
@@ -545,9 +465,7 @@
       background: rgba(255,255,255,0.15);
       border-radius: 2px;
     }
-    @media (max-width: 768px) {
-      .drawer-handle { display: flex; }
-    }
+    @media (max-width: 768px) { .drawer-handle { display: flex; } }
 
     .drawer-head {
       display: flex; align-items: center; justify-content: space-between;
@@ -580,17 +498,12 @@
       overscroll-behavior: contain;
     }
 
-    /* ══════════════════════════════════════
-       DETAIL CONTENT
-    ══════════════════════════════════════ */
     .detail-inner { padding: 14px 16px; display: flex; flex-direction: column; gap: 12px; }
 
-    /* Score + meta row */
     .detail-meta {
       display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
     }
 
-    /* SVG score ring */
     .score-ring-wrap {
       position: relative; width: 72px; height: 72px; flex-shrink: 0;
     }
@@ -620,7 +533,6 @@
       line-height: 1.6;
     }
 
-    /* Execution ticket */
     .ticket {
       border: 1px solid rgba(64,196,255,0.12);
       background: var(--bg3);
@@ -640,16 +552,13 @@
     }
     .ticket-head-left p { font-size: 10px; color: var(--muted); margin-top: 2px; }
 
-    /* Levels grid */
     .levels-grid {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
       gap: 0;
       background: var(--border);
     }
-    @media (max-width: 480px) {
-      .levels-grid { grid-template-columns: repeat(3, 1fr); }
-    }
+    @media (max-width: 480px) { .levels-grid { grid-template-columns: repeat(3, 1fr); } }
 
     .level-cell {
       background: var(--bg3);
@@ -683,37 +592,29 @@
     .level-cell:hover .level-copy { opacity: 1; }
     .level-cell:hover .level-copy:hover { color: var(--green); }
 
-    /* Two-col trade notes */
     .ticket-notes {
       display: grid; grid-template-columns: 1fr 1fr;
       gap: 0; background: var(--border);
     }
-    @media (max-width: 480px) {
-      .ticket-notes { grid-template-columns: 1fr; }
-    }
+    @media (max-width: 480px) { .ticket-notes { grid-template-columns: 1fr; } }
 
     .ticket-col {
       background: var(--bg3);
       padding: 10px 13px;
     }
     .ticket-col + .ticket-col { border-left: 1px solid var(--border); }
-    @media (max-width: 480px) {
-      .ticket-col + .ticket-col { border-left: none; border-top: 1px solid var(--border); }
-    }
+    @media (max-width: 480px) { .ticket-col + .ticket-col { border-left: none; border-top: 1px solid var(--border); } }
 
     .ticket-list { list-style: none; font-size: 11px; color: var(--sub); line-height: 1.75; }
     .ticket-list b { color: var(--text); font-weight: 600; }
 
-    /* Data cards grid */
     .data-cards {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 1px; background: var(--border);
       border: 1px solid var(--border);
     }
-    @media (max-width: 540px) {
-      .data-cards { grid-template-columns: repeat(2, 1fr); }
-    }
+    @media (max-width: 540px) { .data-cards { grid-template-columns: repeat(2, 1fr); } }
 
     .data-card {
       background: var(--bg2); padding: 9px 11px;
@@ -733,7 +634,6 @@
       display: block;
     }
 
-    /* Chart */
     .chart-wrap {
       border: 1px solid var(--border);
       background: #060a0d;
@@ -753,7 +653,6 @@
     }
     .chart-expand:hover { color: var(--text); border-color: var(--sub); }
 
-    /* Narrative collapsible */
     .narrative-toggle {
       display: flex; align-items: center; justify-content: space-between;
       padding: 10px 0;
@@ -775,9 +674,7 @@
       margin-bottom: 8px;
     }
     .narrative-body.open { display: grid; }
-    @media (max-width: 480px) {
-      .narrative-body { grid-template-columns: 1fr; }
-    }
+    @media (max-width: 480px) { .narrative-body { grid-template-columns: 1fr; } }
 
     .nbox { background: var(--bg2); padding: 11px 13px; }
     .nbox h4 {
@@ -789,9 +686,6 @@
     .nbox ul { padding-left: 14px; font-size: 11px; color: var(--sub); line-height: 1.65; }
     .nbox ul li + li { margin-top: 2px; }
 
-    /* ══════════════════════════════════════
-       SINGLE COIN TAB
-    ══════════════════════════════════════ */
     .single-wrap {
       max-width: 680px;
       margin: 0 auto;
@@ -825,9 +719,7 @@
       padding: 10px 14px;
       flex: 1; min-width: 0;
     }
-    .single-input-cell + .single-input-cell {
-      border-left: 1px solid var(--border);
-    }
+    .single-input-cell + .single-input-cell { border-left: 1px solid var(--border); }
 
     .single-input-cell input {
       width: 100%; font-size: 14px; font-weight: 600;
@@ -868,7 +760,6 @@
     }
     .single-status.active { display: block; }
 
-    /* Single result appears inline below the input block */
     .single-result {
       display: none;
       margin-top: 1px;
@@ -883,9 +774,6 @@
       border-bottom: 1px solid var(--border);
     }
 
-    /* ══════════════════════════════════════
-       FULLSCREEN CHART MODAL
-    ══════════════════════════════════════ */
     .modal {
       display: none;
       position: fixed; inset: 0; z-index: 900;
@@ -913,14 +801,9 @@
     }
     .modal-close:hover { border-color: var(--sub); color: var(--text); }
 
-    .modal-chart {
-      flex: 1; overflow: hidden;
-    }
+    .modal-chart { flex: 1; overflow: hidden; }
     .modal-chart svg { width: 100%; height: 100%; }
 
-    /* ══════════════════════════════════════
-       LEGEND
-    ══════════════════════════════════════ */
     .legend-section {
       border-top: 1px solid var(--border);
       background: var(--bg2);
@@ -943,22 +826,13 @@
       gap: 1px; background: var(--border);
     }
     .legend-grid.open { display: grid; }
-    @media (max-width: 600px) {
-      .legend-grid { grid-template-columns: 1fr 1fr; }
-    }
-    @media (max-width: 400px) {
-      .legend-grid { grid-template-columns: 1fr; }
-    }
+    @media (max-width: 600px) { .legend-grid { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 400px) { .legend-grid { grid-template-columns: 1fr; } }
 
-    .legend-item {
-      background: var(--bg2); padding: 10px 13px;
-    }
+    .legend-item { background: var(--bg2); padding: 10px 13px; }
     .legend-item b { display: block; font-weight: 700; color: var(--text); font-size: 11px; margin-bottom: 3px; }
     .legend-item span { font-size: 11px; color: var(--sub); line-height: 1.55; }
 
-    /* ══════════════════════════════════════
-       FOOTER
-    ══════════════════════════════════════ */
     .footer {
       display: flex; align-items: center; justify-content: space-between;
       flex-wrap: wrap; gap: 8px;
@@ -972,9 +846,6 @@
     }
     .footer-logo span { color: var(--green); }
 
-    /* ══════════════════════════════════════
-       EMA BREAKOUT WATCH TAB
-    ══════════════════════════════════════ */
     .ema-wrap { padding: 0; }
 
     .ema-controls {
@@ -983,27 +854,15 @@
       border-bottom: 1px solid var(--border);
     }
 
-    /* Empty state */
     .ema-empty {
       grid-column: 1 / -1;
       display: flex; flex-direction: column; align-items: center;
       padding: 60px 20px; text-align: center;
     }
-    .ema-empty-icon {
-      font-size: 32px; color: var(--muted);
-      margin-bottom: 12px; opacity: 0.4;
-    }
-    .ema-empty-title {
-      font-family: 'Syne', sans-serif;
-      font-weight: 700; font-size: 15px; color: var(--sub);
-      margin-bottom: 8px;
-    }
-    .ema-empty-sub {
-      font-size: 11px; color: var(--muted);
-      max-width: 420px; line-height: 1.65;
-    }
+    .ema-empty-icon { font-size: 32px; color: var(--muted); margin-bottom: 12px; opacity: 0.4; }
+    .ema-empty-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 15px; color: var(--sub); margin-bottom: 8px; }
+    .ema-empty-sub { font-size: 11px; color: var(--muted); max-width: 420px; line-height: 1.65; }
 
-    /* Card grid */
     .ema-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -1011,9 +870,7 @@
       background: var(--border);
       padding: 0;
     }
-    @media (max-width: 600px) {
-      .ema-grid { grid-template-columns: 1fr; }
-    }
+    @media (max-width: 600px) { .ema-grid { grid-template-columns: 1fr; } }
 
     .ema-card {
       background: var(--bg2);
@@ -1024,7 +881,6 @@
     }
     .ema-card:hover { background: var(--bg3); }
 
-    /* Strength stripe on left edge */
     .ema-card::before {
       content: '';
       position: absolute; left: 0; top: 0; bottom: 0;
@@ -1046,10 +902,7 @@
       color: var(--text); letter-spacing: -0.01em;
       line-height: 1;
     }
-    .ema-card-sym span {
-      font-size: 10px; font-weight: 500;
-      color: var(--muted); font-family: 'JetBrains Mono', monospace;
-    }
+    .ema-card-sym span { font-size: 10px; font-weight: 500; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
 
     .ema-card-badges { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
 
@@ -1061,9 +914,7 @@
       color: var(--green); background: var(--green-dim);
       border: 1px solid var(--green-b);
     }
-    .ema-days-lbl {
-      font-size: 9px; color: var(--muted);
-    }
+    .ema-days-lbl { font-size: 9px; color: var(--muted); }
 
     .ema-card-body {
       display: grid; grid-template-columns: 1fr 1fr;
@@ -1071,10 +922,7 @@
       flex: 1;
     }
 
-    .ema-stat-cell {
-      background: var(--bg2);
-      padding: 8px 11px;
-    }
+    .ema-stat-cell { background: var(--bg2); padding: 8px 11px; }
     .ema-card:hover .ema-stat-cell { background: var(--bg3); }
 
     .ema-stat-lbl {
@@ -1100,16 +948,8 @@
 
     .ema-breakout-date { font-size: 10px; color: var(--sub); }
     .ema-above-pct { font-weight: 600; }
+    .ema-pullback { font-size: 9px; color: var(--gold); font-weight: 600; letter-spacing: 0.04em; }
 
-    /* Pullback alert */
-    .ema-pullback {
-      font-size: 9px; color: var(--gold);
-      font-weight: 600; letter-spacing: 0.04em;
-    }
-
-    /* ══════════════════════════════════════
-       HOW TO USE — TECHNO ALERT BOX
-    ══════════════════════════════════════ */
     .howto-box {
       margin: 0;
       border-top: 1px solid rgba(64,196,255,0.18);
@@ -1143,10 +983,7 @@
     .howto-arrow { font-size: 9px; transition: transform 200ms; color: rgba(64,196,255,0.5); }
     .howto-toggle.open .howto-arrow { transform: rotate(180deg); }
 
-    .howto-body {
-      display: none;
-      padding: 0 16px 14px;
-    }
+    .howto-body { display: none; padding: 0 16px 14px; }
     .howto-body.open { display: block; }
 
     .howto-grid {
@@ -1160,20 +997,14 @@
     @media (max-width: 600px) { .howto-grid { grid-template-columns: 1fr 1fr; } }
     @media (max-width: 380px) { .howto-grid { grid-template-columns: 1fr; } }
 
-    .howto-cell {
-      background: rgba(8,11,15,0.8);
-      padding: 9px 11px;
-    }
+    .howto-cell { background: rgba(8,11,15,0.8); padding: 9px 11px; }
     .howto-step {
       font-family: 'Syne', sans-serif;
       font-weight: 700; font-size: 8px;
       letter-spacing: 0.14em; text-transform: uppercase;
       color: var(--cyan); display: block; margin-bottom: 3px;
     }
-    .howto-cell p {
-      font-size: 10px; color: var(--sub);
-      line-height: 1.6; margin: 0;
-    }
+    .howto-cell p { font-size: 10px; color: var(--sub); line-height: 1.6; margin: 0; }
     .howto-cell p b { color: rgba(64,196,255,0.85); font-weight: 600; }
 
     .howto-note {
@@ -1184,22 +1015,14 @@
     }
     .howto-note b { color: rgba(64,196,255,0.6); font-weight: 600; }
 
-    /* ══════════════════════════════════════
-       MOBILE CONTROLS COLLAPSIBLE
-    ══════════════════════════════════════ */
     @media (max-width: 640px) {
       .controls-toggle { display: flex; }
-      .controls-inner {
-        display: none; flex-direction: column;
-      }
+      .controls-inner { display: none; flex-direction: column; }
       .controls-inner.open { display: flex; }
       .ctrl { flex: 1 1 100%; border-right: none; border-bottom: 1px solid var(--border); }
       .ctrl-scan { flex: 1 1 100%; min-height: 48px; padding: 0; }
     }
 
-    /* ══════════════════════════════════════
-       TOUCH DRAG for bottom sheet
-    ══════════════════════════════════════ */
     .drawer { touch-action: pan-y; }
   </style>
 </head>
@@ -1233,15 +1056,11 @@
   </button>
 </div>
 
-<!-- ══════════════════════════════════════
-     PAGE
-══════════════════════════════════════ -->
 <div class="page-wrap">
 
-  <!-- ─── TAB: MARKET SCAN ─── -->
+  <!-- TAB: MARKET SCAN -->
   <div class="tab-pane active" id="tab-market">
 
-    <!-- Controls strip -->
     <div class="controls-strip">
       <button class="controls-toggle" id="controlsToggle" onclick="toggleControls()">
         <span>Scan Controls</span>
@@ -1299,7 +1118,6 @@
       </div>
     </div>
 
-    <!-- Stats strip -->
     <div class="stats-strip">
       <div class="stat">
         <span class="stat-lbl">Pairs Scanned</span>
@@ -1319,20 +1137,16 @@
       </div>
     </div>
 
-    <!-- CORS warning -->
     <div class="warn-bar cors" id="corsWarning">
       <b>⚠ Local file detected.</b> Serve via <code>npx serve .</code> or <code>python -m http.server</code> — exchange APIs block file:// origins.
     </div>
 
-    <!-- Rate limit / refresh warning -->
     <div class="warn-bar info" id="refreshWarning" style="display:none;">
       <b>⚠ High-frequency refresh on Full Market</b> will hit rate limits. Use Top 75 or increase interval.
     </div>
 
-    <!-- Error bar -->
     <div class="warn-bar error" id="errorBox"></div>
 
-    <!-- Progress -->
     <div class="progress-bar-wrap" id="progressPanel">
       <div class="progress-top">
         <div class="progress-top-left">
@@ -1346,7 +1160,6 @@
       </div>
     </div>
 
-    <!-- Result filters + search -->
     <div class="result-filters">
       <div class="rf">
         <span class="ctrl-lbl">Signal</span>
@@ -1400,7 +1213,6 @@
       <input id="searchInput" placeholder="Search symbol…" autocomplete="off" spellcheck="false">
     </div>
 
-    <!-- Table -->
     <div class="table-wrap">
       <table>
         <thead>
@@ -1423,31 +1235,29 @@
       </table>
     </div>
 
-    <!-- Legend -->
     <div class="legend-section">
       <button class="legend-toggle-btn" id="legendToggleBtn" onclick="toggleLegend()">
         <span>Legend &amp; Terminology</span>
         <span id="legendArrow">▾</span>
       </button>
       <div class="legend-grid" id="legendGrid">
-        <div class="legend-item"><b>LONG</b><span>Bullish setup with structure, liquidity, and derivatives confluence.</span></div>
-        <div class="legend-item"><b>SHORT</b><span>Bearish setup with structure, liquidity, and derivatives confluence.</span></div>
-        <div class="legend-item"><b>WAIT</b><span>No clean confluence. Ranging, mixed timeframes, or missing trigger.</span></div>
-        <div class="legend-item"><b>Score</b><span>Confluence from structure, MTF, sweeps, FVG, OI, funding, volume, crowd positioning.</span></div>
-        <div class="legend-item"><b>Funding</b><span>Negative = shorts paying longs. Positive = longs paying shorts.</span></div>
+        <div class="legend-item"><b>LONG</b><span>Bullish MSS or strong CHoCH confirmed, HTF aligned, structure-first signal.</span></div>
+        <div class="legend-item"><b>SHORT</b><span>Bearish MSS or strong CHoCH confirmed, HTF aligned, structure-first signal.</span></div>
+        <div class="legend-item"><b>WAIT</b><span>No MSS/CHoCH confirmed, ranging HTF, or derivatives filter disqualified the setup.</span></div>
+        <div class="legend-item"><b>Score</b><span>Structure-first confluence: MSS/CHoCH/sweep/displacement/FVG/volume lead. Derivatives add max ±13pts only.</span></div>
+        <div class="legend-item"><b>Funding</b><span>Negative = shorts paying longs (bullish lean). Positive = longs paying shorts (bearish lean).</span></div>
         <div class="legend-item"><b>OI</b><span>Rising = fresh positioning. Falling = deleveraging.</span></div>
         <div class="legend-item"><b>L/S</b><span>Long/short ratio. High = crowded longs. Low = crowded shorts.</span></div>
-        <div class="legend-item"><b>MSS</b><span>Market Structure Shift — confirmed reversal: sweep of liquidity → CHoCH → BOS in new direction. Highest confidence signal.</span></div>
-        <div class="legend-item"><b>CHoCH</b><span>Change of Character — first close in the opposite direction through a prior swing, ideally after a sweep. Reversal warning.</span></div>
-        <div class="legend-item"><b>BOS</b><span>Break of Structure — price breaks a recent swing high or low. Continuation in trend direction.</span></div>
-        <div class="legend-item"><b>Sweep</b><span>Liquidity grab: price trades beyond a level then closes back inside.</span></div>
-        <div class="legend-item"><b>FVG</b><span>Fair value gap / imbalance. Used as entry or reaction zone.</span></div>
+        <div class="legend-item"><b>MSS</b><span>Market Structure Shift — confirmed reversal: sweep of liquidity → CHoCH → BOS in new direction. Highest confidence. Unlocks signal.</span></div>
+        <div class="legend-item"><b>CHoCH</b><span>Change of Character — close through most recent lower high (bull) or higher low (bear) after sweep. Strong CHoCH unlocks signal.</span></div>
+        <div class="legend-item"><b>BOS</b><span>Break of Structure — continuation signal only. Does NOT unlock a trade alone.</span></div>
+        <div class="legend-item"><b>Sweep</b><span>Liquidity grab: price trades beyond a level then closes back inside. Required for strong CHoCH.</span></div>
+        <div class="legend-item"><b>FVG</b><span>Fair value gap / imbalance. Valid until 50% midpoint is breached. Used as entry zone.</span></div>
         <div class="legend-item"><b>BSL / SSL</b><span>Buy-side liquidity above swing highs. Sell-side below swing lows.</span></div>
-        <div class="legend-item"><b>MTF</b><span>Multi-timeframe confluence. Selected TF vs higher timeframes.</span></div>
+        <div class="legend-item"><b>MTF</b><span>Multi-timeframe confluence. Ranging HTF = WAIT always.</span></div>
       </div>
     </div>
 
-    <!-- How To Use -->
     <div class="howto-box">
       <button class="howto-toggle" id="howtoToggle" onclick="toggleHowto()">
         <span class="howto-toggle-left">
@@ -1464,11 +1274,11 @@
           </div>
           <div class="howto-cell">
             <span class="howto-step">② Scan</span>
-            <p>Hit <b>Scan Market</b>. The engine fetches live OI, funding, candles, and runs multi-timeframe structure analysis on every pair.</p>
+            <p>Hit <b>Scan Market</b>. Engine fetches live OI, funding, candles, and runs structure-first SMC analysis on every pair.</p>
           </div>
           <div class="howto-cell">
             <span class="howto-step">③ Filter results</span>
-            <p>Use <b>Signal / Trend / Structure / Funding / OI</b> dropdowns to narrow. Sort by <b>Score</b> — higher = more confluent setup.</p>
+            <p>Use <b>Signal / Trend / Structure</b> dropdowns. Sort by <b>Score</b> — structure drives the score, derivatives are a small bonus.</p>
           </div>
           <div class="howto-cell">
             <span class="howto-step">④ Open detail</span>
@@ -1476,7 +1286,7 @@
           </div>
           <div class="howto-cell">
             <span class="howto-step">⑤ WAIT setups</span>
-            <p>A <b>WAIT</b> badge means conditions aren't aligned yet. The detail panel explains exactly <b>what's missing</b> and what to watch for.</p>
+            <p>A <b>WAIT</b> badge means no MSS/CHoCH confirmed yet. The detail panel explains exactly what's missing and what to watch for.</p>
           </div>
           <div class="howto-cell">
             <span class="howto-step">⑥ Single coin</span>
@@ -1484,8 +1294,8 @@
           </div>
         </div>
         <p class="howto-note">
-          <b>Score guide:</b> ≥65 = high confluence · 45–64 = developing setup · &lt;45 = low edge, wait for more confirmation. &nbsp;|&nbsp;
-          <b>Scan speed:</b> Full Market ~2–4 min depending on exchange response time. Use Top 50 for faster refreshes. &nbsp;|&nbsp;
+          <b>Score guide:</b> ≥65 = high confluence (MSS confirmed) · 45–64 = developing CHoCH · &lt;45 = wait for structure shift. &nbsp;|&nbsp;
+          <b>Philosophy:</b> Derivatives are the cherry on top — structure generates the signal. &nbsp;|&nbsp;
           <b>Not financial advice.</b> Always validate setups manually before taking any trade.
         </p>
       </div>
@@ -1498,14 +1308,13 @@
 
   </div><!-- /tab-market -->
 
-  <!-- ─── TAB: SINGLE COIN ─── -->
+  <!-- TAB: SINGLE COIN -->
   <div class="tab-pane" id="tab-single">
     <div class="single-wrap">
-
       <div class="single-input-block">
         <div class="single-input-head">
           <h2>Single Coin Deep Scan</h2>
-          <p>Full trade plan for any symbol — no market scan needed.</p>
+          <p>Full trade plan for any symbol — structure-first analysis, derivatives as confluence.</p>
         </div>
         <div style="background:var(--border); display:flex; gap:1px;">
           <div class="single-input-cell">
@@ -1548,15 +1357,12 @@
         </div>
         <div id="singleDetail" class="detail-inner"></div>
       </div>
-
     </div>
   </div><!-- /tab-single -->
 
-  <!-- ─── TAB: EMA BREAKOUT WATCH ─── -->
+  <!-- TAB: EMA BREAKOUT WATCH -->
   <div class="tab-pane" id="tab-ema">
     <div class="ema-wrap">
-
-      <!-- Controls -->
       <div class="ema-controls">
         <div class="ctrl" style="flex:1; min-width:160px;">
           <span class="ctrl-lbl">Universe</span>
@@ -1586,12 +1392,10 @@
         </div>
       </div>
 
-      <!-- Info bar -->
       <div class="warn-bar info active" id="emaInfoBar" style="display:block;">
         <b>Daily 50 EMA Breakout Scanner</b> — Finds coins where the <b>daily close</b> crossed above the 50 EMA (not a wick) and has held for 3+ consecutive daily closes within your selected window. Fresh setups only.
       </div>
 
-      <!-- Progress -->
       <div class="progress-bar-wrap" id="emaProgressPanel">
         <div class="progress-top">
           <div class="progress-top-left">
@@ -1605,10 +1409,8 @@
         </div>
       </div>
 
-      <!-- Error bar -->
       <div class="warn-bar error" id="emaErrorBox"></div>
 
-      <!-- Stats strip -->
       <div class="stats-strip" id="emaStats" style="display:none;">
         <div class="stat">
           <span class="stat-lbl">Coins Scanned</span>
@@ -1628,7 +1430,6 @@
         </div>
       </div>
 
-      <!-- Card grid results -->
       <div class="ema-grid" id="emaGrid">
         <div class="ema-empty">
           <div class="ema-empty-icon">◎</div>
@@ -1636,15 +1437,12 @@
           <div class="ema-empty-sub">Scan to find coins that recently crossed and held the daily 50 EMA. Only fresh breakouts within your selected window will appear.</div>
         </div>
       </div>
-
     </div>
   </div><!-- /tab-ema -->
 
 </div><!-- /page-wrap -->
 
-<!-- ══════════════════════════════════════
-     DETAIL DRAWER
-══════════════════════════════════════ -->
+<!-- DETAIL DRAWER -->
 <div class="drawer-backdrop" id="drawerBackdrop" onclick="closeDrawer()"></div>
 <div class="drawer" id="drawer">
   <div class="drawer-handle"><div class="drawer-handle-bar"></div></div>
@@ -1681,7 +1479,7 @@
 
 <script>
 /* ══════════════════════════════════════
-   ENDPOINTS (internal)
+   ENDPOINTS
 ══════════════════════════════════════ */
 const _EP = {
   bf: 'https://fapi.binance.com/fapi/v1',
@@ -1759,7 +1557,6 @@ const el = {
   singleExportBtn: document.getElementById('singleExportBtn'),
   singleResultTitle: document.getElementById('singleResultTitle'),
   singleDetail:    document.getElementById('singleDetail'),
-  // EMA Watch tab
   emaScanBtn:      document.getElementById('emaScanBtn'),
   emaUniverse:     document.getElementById('emaUniverse'),
   emaDepth:        document.getElementById('emaDepth'),
@@ -1780,7 +1577,6 @@ const el = {
   emaInfoBar:      document.getElementById('emaInfoBar')
 };
 
-/* CORS warning */
 if (location.protocol === 'file:') el.corsWarning.classList.add('active');
 
 /* ══════════════════════════════════════
@@ -1792,7 +1588,7 @@ const tfMap = {
   '1h':  { higher: ['4h','1d'],   limit: 180, label: '1h Swing',     oiPeriod: '1h',  oiLimit: 3, lsPeriod: '1h',  lsLimit: 3, fundingThreshold: 0.00035, staleMs: 60*60000 },
   '4h':  { higher: ['1d','1w'],   limit: 180, label: '4h Position',  oiPeriod: '4h',  oiLimit: 3, lsPeriod: '4h',  lsLimit: 3, fundingThreshold: 0.00050, staleMs: 4*60*60000 },
   '1d':  { higher: ['1w'],        limit: 220, label: '1D Macro',     oiPeriod: '1d',  oiLimit: 3, lsPeriod: '1d',  lsLimit: 3, fundingThreshold: 0.00075, staleMs: 24*60*60000 },
-  '1w':  { higher: [],           limit: 52,  label: '1W Weekly',    oiPeriod: '1d',  oiLimit: 3, lsPeriod: '1d',  lsLimit: 3, fundingThreshold: 0.00100, staleMs: 7*24*60*60000 }
+  '1w':  { higher: [],            limit: 52,  label: '1W Weekly',    oiPeriod: '1d',  oiLimit: 3, lsPeriod: '1d',  lsLimit: 3, fundingThreshold: 0.00100, staleMs: 7*24*60*60000 }
 };
 
 const bybitIntervals = { '5m':'5','15m':'15','1h':'60','4h':'240','1d':'D','1w':'W' };
@@ -1840,7 +1636,6 @@ function showError(msg) {
 
 function clamp(n, min, max) { return Math.max(min, Math.min(max, n)); }
 
-// Scan timing state for ETA
 const _scanTimer = { startMs: 0, phase: '' };
 
 function setProgress(stage, done, total, curSymbol, forcedPct) {
@@ -1887,16 +1682,13 @@ function finishProgress() {
   el.progressPercent.textContent = '100%';
   el.progressFill.style.width    = '100%';
   state.progressPercent = 100;
-  setTimeout(() => {
-    el.progressSub.innerHTML = '';
-  }, 3000);
+  setTimeout(() => { el.progressSub.innerHTML = ''; }, 3000);
 }
 
 function nextPaint() {
   return new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
 }
 
-/* Staleness indicator */
 function startStalenessWatch(tf) {
   clearInterval(state.stalenessInterval);
   state.lastScanTf = tf;
@@ -1908,13 +1700,9 @@ function startStalenessWatch(tf) {
     const age = Date.now() - state.lastScanTime;
     const candle = config.staleMs;
     el.lastScan.textContent = 'Last: ' + new Date(state.lastScanTime).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
-    if (age > candle * 2) {
-      el.lastScan.className = 'stale-crit';
-    } else if (age > candle) {
-      el.lastScan.className = 'stale-warn';
-    } else {
-      el.lastScan.className = '';
-    }
+    if (age > candle * 2) { el.lastScan.className = 'stale-crit'; }
+    else if (age > candle) { el.lastScan.className = 'stale-warn'; }
+    else { el.lastScan.className = ''; }
   }, 10000);
 }
 
@@ -1934,7 +1722,6 @@ function openDrawer(row) {
     `<span class="badge b-info">MTF: ${trade.mtfBias}</span>` +
     (row.analysis.primary.smcEvent ? `<span class="badge ${row.analysis.primary.smcEvent.type === 'MSS' ? 'b-sell' : row.analysis.primary.smcEvent.direction === 'Bullish' ? 'b-buy' : 'b-sell'}" style="font-size:9px;">${row.analysis.primary.smcEvent.label}</span>` : '');
   renderDetail(row, el.drawerDetail, tf);
-  // Show export button only for LONG/SHORT setups
   el.drawerExportBtn.style.display = (trade.side === 'LONG' || trade.side === 'SHORT') ? 'inline-flex' : 'none';
   el.drawer.classList.add('open');
   el.drawerBackdrop.classList.add('open');
@@ -1947,7 +1734,6 @@ function closeDrawer() {
   document.body.style.overflow = '';
 }
 
-/* Touch drag to close bottom sheet */
 el.drawer.addEventListener('touchstart', e => { _touchStartY = e.touches[0].clientY; }, { passive: true });
 el.drawer.addEventListener('touchmove', e => {
   if (window.innerWidth > 768) return;
@@ -2110,7 +1896,7 @@ async function fetchMarket() {
 }
 
 /* ══════════════════════════════════════
-   HYDRATE OI — provider aware
+   HYDRATE OI
 ══════════════════════════════════════ */
 async function hydrateOpenInterest(rows, onProgress) {
   const tf     = el.timeframe.value;
@@ -2198,7 +1984,22 @@ function atr(candles, len = 14) {
   return sma(trs, Math.min(len, trs.length));
 }
 
-function findPivots(candles, wing = 3) {
+function ema(values, len) {
+  if (!values.length) return 0;
+  const k = 2 / (len + 1);
+  let v = values[0];
+  for (let i = 1; i < values.length; i++) v = values[i] * k + v * (1 - k);
+  return v;
+}
+
+/* ══════════════════════════════════════
+   FIX 1: findPivots() — DYNAMIC WING SIZE
+   Wing is now timeframe-aware:
+   5m/15m=3, 1h=4, 4h=5, 1d=7, 1w=9
+══════════════════════════════════════ */
+function findPivots(candles, tf) {
+  const wingMap = { '5m': 3, '15m': 3, '1h': 4, '4h': 5, '1d': 7, '1w': 9 };
+  const wing = wingMap[tf] || 3;
   const highs = [], lows = [];
   for (let i = wing; i < candles.length - wing; i++) {
     let isHigh = true, isLow = true;
@@ -2213,26 +2014,26 @@ function findPivots(candles, wing = 3) {
   return { highs, lows };
 }
 
-function ema(values, len) {
-  if (!values.length) return 0;
-  const k = 2 / (len + 1);
-  let v = values[0];
-  for (let i = 1; i < values.length; i++) v = values[i] * k + v * (1 - k);
-  return v;
-}
-
+/* ══════════════════════════════════════
+   FIX 5: detectFvg() — MIDPOINT FILL CHECK
+   FVG stays valid until 50% midpoint breached
+   (not just any wick touching the edge)
+══════════════════════════════════════ */
 function detectFvg(candles, tf) {
   const lookbacks = { '5m': 35, '15m': 35, '1h': 60, '4h': 90, '1d': 120 };
   const lookback = lookbacks[tf] || 35;
-  const lastClose = candles[candles.length - 1].close;
   for (let i = candles.length - 1; i >= Math.max(2, candles.length - lookback); i--) {
     const a = candles[i - 2], c = candles[i];
+    // Bullish FVG: gap between candle[i-2] high and candle[i] low
     if (a.high < c.low) {
-      const filled = candles.slice(i + 1).some(bar => bar.low <= a.high);
+      const midpoint = a.high + (c.low - a.high) * 0.5;
+      const filled = candles.slice(i + 1).some(bar => bar.low <= midpoint);
       if (!filled) return { side: 'Bullish', low: a.high, high: c.low };
     }
+    // Bearish FVG: gap between candle[i-2] low and candle[i] high
     if (a.low > c.high) {
-      const filled = candles.slice(i + 1).some(bar => bar.high >= a.low);
+      const midpoint = a.low - (a.low - c.high) * 0.5;
+      const filled = candles.slice(i + 1).some(bar => bar.high >= midpoint);
       if (!filled) return { side: 'Bearish', low: c.high, high: a.low };
     }
   }
@@ -2240,17 +2041,15 @@ function detectFvg(candles, tf) {
 }
 
 /* ══════════════════════════════════════
-   CANDLESTICK PATTERN DETECTION  (FIX T3)
-   Returns array of { name, direction:'Bullish'|'Bearish', strength:1-3 }
-   Checks last 3 candles. strength: 1=weak, 2=medium, 3=strong
+   CANDLESTICK PATTERN DETECTION
 ══════════════════════════════════════ */
 function detectCandlePatterns(candles) {
   if (!candles || candles.length < 3) return [];
   const patterns = [];
   const n  = candles.length;
-  const c0 = candles[n - 1]; // current / most recent
-  const c1 = candles[n - 2]; // previous
-  const c2 = candles[n - 3]; // two bars ago
+  const c0 = candles[n - 1];
+  const c1 = candles[n - 2];
+  const c2 = candles[n - 3];
 
   const body0  = Math.abs(c0.close - c0.open);
   const body1  = Math.abs(c1.close - c1.open);
@@ -2265,108 +2064,64 @@ function detectCandlePatterns(candles) {
   const bull1 = c1.close > c1.open;
   const bull2 = c2.close > c2.open;
 
-  // — Doji (indecision) —
   if (body0 / range0 < 0.12 && range0 > 0) {
     patterns.push({ name: 'Doji', direction: 'Neutral', strength: 1 });
   }
-
-  // — Hammer (bullish reversal) — small body top, long lower shadow, at bottom —
   if (!bull1 && lowerShadow0 >= body0 * 2.2 && upperShadow0 < body0 * 0.5 && body0 / range0 > 0.1) {
     patterns.push({ name: 'Hammer', direction: 'Bullish', strength: 2 });
   }
-
-  // — Inverted Hammer (bullish after down move) —
   if (!bull1 && upperShadow0 >= body0 * 2.2 && lowerShadow0 < body0 * 0.5 && body0 / range0 > 0.1) {
     patterns.push({ name: 'Inverted Hammer', direction: 'Bullish', strength: 1 });
   }
-
-  // — Shooting Star (bearish reversal) — small body bottom, long upper shadow, at top —
   if (bull1 && upperShadow0 >= body0 * 2.2 && lowerShadow0 < body0 * 0.5 && body0 / range0 > 0.1) {
     patterns.push({ name: 'Shooting Star', direction: 'Bearish', strength: 2 });
   }
-
-  // — Hanging Man (bearish after up move) —
   if (bull1 && lowerShadow0 >= body0 * 2.2 && upperShadow0 < body0 * 0.5 && body0 / range0 > 0.1) {
     patterns.push({ name: 'Hanging Man', direction: 'Bearish', strength: 1 });
   }
-
-  // — Bullish Engulfing —
   if (!bull1 && bull0 && c0.open < c1.close && c0.close > c1.open && body0 > body1 * 1.05) {
     patterns.push({ name: 'Bullish Engulfing', direction: 'Bullish', strength: 3 });
   }
-
-  // — Bearish Engulfing —
   if (bull1 && !bull0 && c0.open > c1.close && c0.close < c1.open && body0 > body1 * 1.05) {
     patterns.push({ name: 'Bearish Engulfing', direction: 'Bearish', strength: 3 });
   }
-
-  // — Bullish Pinbar (long lower wick, rejection from low) —
   if (lowerShadow0 > range0 * 0.55 && body0 < range0 * 0.35 && upperShadow0 < range0 * 0.25) {
     patterns.push({ name: 'Bullish Pinbar', direction: 'Bullish', strength: 2 });
   }
-
-  // — Bearish Pinbar (long upper wick, rejection from high) —
   if (upperShadow0 > range0 * 0.55 && body0 < range0 * 0.35 && lowerShadow0 < range0 * 0.25) {
     patterns.push({ name: 'Bearish Pinbar', direction: 'Bearish', strength: 2 });
   }
-
-  // — Bullish Marubozu (strong bullish body, no shadows) —
   if (bull0 && body0 / range0 > 0.88) {
     patterns.push({ name: 'Bullish Marubozu', direction: 'Bullish', strength: 2 });
   }
-
-  // — Bearish Marubozu (strong bearish body, no shadows) —
   if (!bull0 && body0 / range0 > 0.88) {
     patterns.push({ name: 'Bearish Marubozu', direction: 'Bearish', strength: 2 });
   }
-
-  // — Bullish Harami (small bull inside prior large bear) —
   if (!bull1 && bull0 && c0.open > c1.close && c0.close < c1.open && body0 < body1 * 0.55) {
     patterns.push({ name: 'Bullish Harami', direction: 'Bullish', strength: 1 });
   }
-
-  // — Bearish Harami (small bear inside prior large bull) —
   if (bull1 && !bull0 && c0.open < c1.close && c0.close > c1.open && body0 < body1 * 0.55) {
     patterns.push({ name: 'Bearish Harami', direction: 'Bearish', strength: 1 });
   }
-
-  // — Morning Star (3-bar: bear, doji/small, bull) —
   if (!bull2 && body1 / (c1.high - c1.low || 1) < 0.35 && bull0 && c0.close > (c2.open + c2.close) / 2) {
     patterns.push({ name: 'Morning Star', direction: 'Bullish', strength: 3 });
   }
-
-  // — Evening Star (3-bar: bull, doji/small, bear) —
   if (bull2 && body1 / (c1.high - c1.low || 1) < 0.35 && !bull0 && c0.close < (c2.open + c2.close) / 2) {
     patterns.push({ name: 'Evening Star', direction: 'Bearish', strength: 3 });
   }
-
-  // — Three White Soldiers (3 consecutive bullish bodies each closing higher) —
-  if (bull0 && bull1 && bull2 &&
-      c0.close > c1.close && c1.close > c2.close &&
-      c0.open > c1.open  && c1.open  > c2.open  &&
-      body0 > 0 && body1 > 0 && body2 > 0) {
+  if (bull0 && bull1 && bull2 && c0.close > c1.close && c1.close > c2.close && c0.open > c1.open && c1.open > c2.open && body0 > 0 && body1 > 0 && body2 > 0) {
     patterns.push({ name: 'Three White Soldiers', direction: 'Bullish', strength: 3 });
   }
-
-  // — Three Black Crows (3 consecutive bearish bodies each closing lower) —
-  if (!bull0 && !bull1 && !bull2 &&
-      c0.close < c1.close && c1.close < c2.close &&
-      c0.open  < c1.open  && c1.open  < c2.open  &&
-      body0 > 0 && body1 > 0 && body2 > 0) {
+  if (!bull0 && !bull1 && !bull2 && c0.close < c1.close && c1.close < c2.close && c0.open < c1.open && c1.open < c2.open && body0 > 0 && body1 > 0 && body2 > 0) {
     patterns.push({ name: 'Three Black Crows', direction: 'Bearish', strength: 3 });
   }
-
-  // — Tweezer Bottom (two candles with same low: bull reversal signal) —
   if (!bull1 && bull0 && Math.abs(c0.low - c1.low) / (range0 || 1) < 0.05) {
     patterns.push({ name: 'Tweezer Bottom', direction: 'Bullish', strength: 2 });
   }
-
-  // — Tweezer Top (two candles with same high: bear reversal signal) —
   if (bull1 && !bull0 && Math.abs(c0.high - c1.high) / (range0 || 1) < 0.05) {
     patterns.push({ name: 'Tweezer Top', direction: 'Bearish', strength: 2 });
   }
 
-  // Remove duplicates by name, keep highest strength
   const seen = new Map();
   for (const p of patterns) {
     const ex = seen.get(p.name);
@@ -2375,8 +2130,15 @@ function detectCandlePatterns(candles) {
   return [...seen.values()];
 }
 
+/* ══════════════════════════════════════
+   FIX 1+2: analyzeStructure()
+   — Uses dynamic wing via findPivots(candles, tf)
+   — FIX 2: CHoCH uses correct pivot reference:
+     Bullish CHoCH = close above most recent Lower High
+     Bearish CHoCH = close below most recent Higher Low
+   — FIX 3: MSS uses same candles.slice(-20) for both sides
+══════════════════════════════════════ */
 function analyzeStructure(candles, tf) {
-  // FIX T5: weekly candles are limited — allow as few as 20 bars for 1w analysis
   const minBars = tf === '1w' ? 20 : 60;
   if (!candles || candles.length < minBars) return {
     last: candles?.[candles.length-1] || { close:0, open:0, high:0, low:0, volume:0 },
@@ -2396,19 +2158,23 @@ function analyzeStructure(candles, tf) {
   const closes = candles.map(c => c.close);
   const last   = candles[candles.length - 1];
   const a      = atr(candles);
-  const pivots = findPivots(candles);
+
+  // FIX 1: pass tf into findPivots for dynamic wing size
+  const pivots   = findPivots(candles, tf);
   const lastHighs = pivots.highs.slice(-5);
   const lastLows  = pivots.lows.slice(-5);
+
   let recentHigh = lastHighs[lastHighs.length - 1] || { price: Math.max(...candles.slice(-30).map(c => c.high)), index: candles.length - 1 };
   let recentLow  = lastLows[lastLows.length - 1]   || { price: Math.min(...candles.slice(-30).map(c => c.low)),  index: candles.length - 1 };
-  // BUG 1 FIX: swap if inverted — a swing low can never be numerically above a swing high
   if (recentHigh.price < recentLow.price) { [recentHigh, recentLow] = [recentLow, recentHigh]; }
+
   let prevHigh = lastHighs[lastHighs.length - 2] || recentHigh;
   let prevLow  = lastLows[lastLows.length - 2]   || recentLow;
   if (prevHigh.price < prevLow.price) { [prevHigh, prevLow] = [prevLow, prevHigh]; }
-  const emaFast  = ema(closes, 21);
-  const emaSlow  = ema(closes, 55);
-  const slope    = emaFast - emaSlow;
+
+  const emaFast = ema(closes, 21);
+  const emaSlow = ema(closes, 55);
+  const slope   = emaFast - emaSlow;
 
   const brokeHigh = last.close > recentHigh.price;
   const brokeLow  = last.close < recentLow.price;
@@ -2430,6 +2196,7 @@ function analyzeStructure(candles, tf) {
   const fvg = detectFvg(candles, tf);
   const trendStrength = a ? Math.abs(slope) / a : 0;
 
+  // BOS detection (unchanged)
   let bos = null;
   if (lastHighs.length >= 2 && last.close > prevHigh.price) {
     bos = { direction: 'Bullish', level: prevHigh.price, type: 'BOS', label: 'BOS ↑' };
@@ -2437,28 +2204,62 @@ function analyzeStructure(candles, tf) {
     bos = { direction: 'Bearish', level: prevLow.price, type: 'BOS', label: 'BOS ↓' };
   }
 
+  /* ─── FIX 2: CHoCH uses correct pivot reference ───
+     Bullish CHoCH = in downtrend, close above the MOST RECENT Lower High
+     (the last pivot high that is lower than the one before it)
+     Bearish CHoCH = in uptrend, close below the MOST RECENT Higher Low
+     (the last pivot low that is higher than the one before it)
+  ─────────────────────────────────────────────────── */
   let choch = null;
   const recentBearish = lowerHighs && lowerLows;
   const recentBullish = higherHighs && higherLows;
 
-  if (recentBearish && sweepLow && last.close > prevHigh.price) {
-    choch = { direction: 'Bullish', level: prevHigh.price, type: 'CHoCH',
-      label: 'CHoCH ↑', trigger: 'SSL sweep + close above swing high' };
-  } else if (recentBullish && sweepHigh && last.close < prevLow.price) {
-    choch = { direction: 'Bearish', level: prevLow.price, type: 'CHoCH',
-      label: 'CHoCH ↓', trigger: 'BSL sweep + close below swing low' };
-  } else if (recentBearish && last.close > recentHigh.price && !sweepLow) {
-    choch = { direction: 'Bullish', level: recentHigh.price, type: 'CHoCH',
-      label: 'CHoCH ↑ (weak)', trigger: 'Close above swing high in downtrend' };
-  } else if (recentBullish && last.close < recentLow.price && !sweepHigh) {
-    choch = { direction: 'Bearish', level: recentLow.price, type: 'CHoCH',
-      label: 'CHoCH ↓ (weak)', trigger: 'Close below swing low in uptrend' };
+  // Find the most recent Lower High in a downtrend
+  let mostRecentLowerHigh = null;
+  if (lastHighs.length >= 2) {
+    // Walk backwards through pivot highs to find last LH (lower than its predecessor)
+    for (let i = lastHighs.length - 1; i >= 1; i--) {
+      if (lastHighs[i].price < lastHighs[i-1].price) {
+        mostRecentLowerHigh = lastHighs[i];
+        break;
+      }
+    }
+  }
+  if (!mostRecentLowerHigh) mostRecentLowerHigh = recentHigh;
+
+  // Find the most recent Higher Low in an uptrend
+  let mostRecentHigherLow = null;
+  if (lastLows.length >= 2) {
+    for (let i = lastLows.length - 1; i >= 1; i--) {
+      if (lastLows[i].price > lastLows[i-1].price) {
+        mostRecentHigherLow = lastLows[i];
+        break;
+      }
+    }
+  }
+  if (!mostRecentHigherLow) mostRecentHigherLow = recentLow;
+
+  // Strong CHoCH: requires sweep before the close
+  if (recentBearish && sweepLow && last.close > mostRecentLowerHigh.price) {
+    choch = { direction: 'Bullish', level: mostRecentLowerHigh.price, type: 'CHoCH',
+      label: 'CHoCH ↑', trigger: 'SSL sweep + close above most recent Lower High (' + fmtPrice(mostRecentLowerHigh.price) + ')' };
+  } else if (recentBullish && sweepHigh && last.close < mostRecentHigherLow.price) {
+    choch = { direction: 'Bearish', level: mostRecentHigherLow.price, type: 'CHoCH',
+      label: 'CHoCH ↓', trigger: 'BSL sweep + close below most recent Higher Low (' + fmtPrice(mostRecentHigherLow.price) + ')' };
+  }
+  // Weak CHoCH: no sweep, lower confidence — will NOT unlock a signal
+  else if (recentBearish && last.close > mostRecentLowerHigh.price) {
+    choch = { direction: 'Bullish', level: mostRecentLowerHigh.price, type: 'CHoCH',
+      label: 'CHoCH ↑ (weak)', trigger: 'Close above most recent Lower High — no sweep preceded it' };
+  } else if (recentBullish && last.close < mostRecentHigherLow.price) {
+    choch = { direction: 'Bearish', level: mostRecentHigherLow.price, type: 'CHoCH',
+      label: 'CHoCH ↓ (weak)', trigger: 'Close below most recent Higher Low — no sweep preceded it' };
   }
 
+  /* ─── FIX 3: MSS uses same candles.slice(-20) for BOTH sides ─── */
   let mss = null;
-  const lookback = candles.slice(-20);
-  const sweepLowRecent  = lookback.some(c => c.low  < recentLow.price  && c.close > recentLow.price);
-  const sweepHighRecent = lookback.slice(-12).some(c => c.high > recentHigh.price && c.close < recentHigh.price);
+  const sweepLowRecent  = candles.slice(-20).some(c => c.low  < recentLow.price  && c.close > recentLow.price);
+  const sweepHighRecent = candles.slice(-20).some(c => c.high > recentHigh.price && c.close < recentHigh.price);
 
   if (sweepLowRecent && higherHighs && last.close > prevHigh.price) {
     mss = { direction: 'Bullish', type: 'MSS',
@@ -2485,24 +2286,30 @@ function analyzeStructure(candles, tf) {
   else if (bias === 'Bearish') trend = 'Bearish transition';
 
   let structureEvent = 'Building range';
-  if (mss)              structureEvent = mss.label;
-  else if (choch)       structureEvent = choch.label;
-  else if (bos)         structureEvent = bos.label;
-  else if (sweepHigh)   structureEvent = 'BSL sweep';
-  else if (sweepLow)    structureEvent = 'SSL sweep';
-  else if (brokeHigh)   structureEvent = 'BOS above resistance';
-  else if (brokeLow)    structureEvent = 'BOS below support';
+  if (mss)            structureEvent = mss.label;
+  else if (choch)     structureEvent = choch.label;
+  else if (bos)       structureEvent = bos.label;
+  else if (sweepHigh) structureEvent = 'BSL sweep';
+  else if (sweepLow)  structureEvent = 'SSL sweep';
+  else if (brokeHigh) structureEvent = 'BOS above resistance';
+  else if (brokeLow)  structureEvent = 'BOS below support';
 
-  return { last, atr: a, pivots, recentHigh, recentLow, prevHigh, prevLow, emaFast, emaSlow,
-    bias, brokeHigh, brokeLow, sweepLow, sweepHigh, displacement, volumeExpansion,
-    trend, trendStrength, structureEvent, fvg,
+  return {
+    last, atr: a, pivots, recentHigh, recentLow, prevHigh, prevLow,
+    emaFast, emaSlow, bias, brokeHigh, brokeLow, sweepLow, sweepHigh,
+    displacement, volumeExpansion, trend, trendStrength, structureEvent, fvg,
     bos, choch, mss, smcEvent,
     candlePatterns: detectCandlePatterns(candles),
-    higherHighs, higherLows, lowerHighs, lowerLows };
+    higherHighs, higherLows, lowerHighs, lowerLows,
+    mostRecentLowerHigh, mostRecentHigherLow
+  };
 }
 
 /* ══════════════════════════════════════
-   DERIVATIVES RULE
+   FIX 8: deriveDerivativesRule() — DISPLAY ONLY
+   Kept exactly as-is for display/context.
+   actionSide is informational only — does NOT
+   set signal direction in deriveTrade().
 ══════════════════════════════════════ */
 function deriveDerivativesRule(row, tf) {
   const config    = tfMap[tf] || tfMap['15m'];
@@ -2527,7 +2334,47 @@ function deriveDerivativesRule(row, tf) {
 }
 
 /* ══════════════════════════════════════
-   DERIVE TRADE
+   FIX 6: findDisplacementCandle()
+   Helper to find the most recent displacement
+   candle of the given direction in candles.
+   Returns the candle or null.
+══════════════════════════════════════ */
+function findDisplacementCandle(candles, direction, atrVal) {
+  // Search last 10 candles for a displacement candle in the required direction
+  for (let i = candles.length - 1; i >= Math.max(0, candles.length - 10); i--) {
+    const c = candles[i];
+    const body = Math.abs(c.close - c.open);
+    if (body > atrVal * 0.65) {
+      if (direction === 'LONG'  && c.close > c.open) return c;
+      if (direction === 'SHORT' && c.close < c.open) return c;
+    }
+  }
+  return null;
+}
+
+/* ══════════════════════════════════════
+   FIX 7: deriveTrade() — COMPLETE REWRITE
+   PHILOSOPHY:
+   - Structure generates the signal (TIER 1)
+   - Price action confirms the entry (TIER 2)
+   - Derivatives adjust score only (TIER 3)
+
+   SIGNAL UNLOCK RULES:
+   - MSS (any direction, HTF not opposing) = signal
+   - Strong CHoCH (no 'weak', with sweep, HTF not opposing) = signal
+   - Everything else = WAIT
+   - MTF Ranging = WAIT always
+   - MTF Mixed + no MSS = WAIT always
+   - derivativesRule.skip = WAIT, score 0
+
+   SCORING:
+   - Structure carries 80%+ of the score
+   - Derivatives max ±13 pts adjustment at end
+   - No division by 1.3 (artificial suppression removed)
+
+   FIX 6: Entry zone uses displacement candle
+   50% body level, falls back to FVG midpoint,
+   then structural level + small ATR offset.
 ══════════════════════════════════════ */
 function deriveTrade(row, primary, higherAnalyses, tf) {
   const htfBull  = higherAnalyses.filter(a => a.bias === 'Bullish').length;
@@ -2541,38 +2388,54 @@ function deriveTrade(row, primary, higherAnalyses, tf) {
   const derivativesRule = deriveDerivativesRule(row, tf);
   const crowdLong  = row.longShortRatio > 1.65;
   const crowdShort = row.longShortRatio > 0 && row.longShortRatio < 0.65;
+  const config     = tfMap[tf] || tfMap['15m'];
 
-  let side = derivativesRule.actionSide;
-  let smcOverride = false;
+  /* ─── STEP 1: Signal direction from structure ONLY ─── */
+  let side = 'WAIT';
 
-  if (primary.mss) {
-    if (primary.mss.direction === 'Bullish' && mtfBias !== 'Bearish') {
-      side = 'LONG'; smcOverride = true;
-    } else if (primary.mss.direction === 'Bearish' && mtfBias !== 'Bullish') {
-      side = 'SHORT'; smcOverride = true;
+  // Hard WAIT conditions
+  const htfRanging = mtfBias === 'Ranging';
+  const htfMixedNoMss = mtfBias === 'Mixed' && !primary.mss;
+
+  if (!derivativesRule.skip && !htfRanging && !htfMixedNoMss) {
+    // MSS unlocks signal (highest confidence)
+    if (primary.mss) {
+      if (primary.mss.direction === 'Bullish' && mtfBias !== 'Bearish') {
+        side = 'LONG';
+      } else if (primary.mss.direction === 'Bearish' && mtfBias !== 'Bullish') {
+        side = 'SHORT';
+      }
     }
-  } else if (primary.choch && !primary.choch.label.includes('weak')) {
-    if (primary.choch.direction === 'Bullish' && mtfBias !== 'Bearish') {
-      side = 'LONG'; smcOverride = true;
-    } else if (primary.choch.direction === 'Bearish' && mtfBias !== 'Bullish') {
-      side = 'SHORT'; smcOverride = true;
+    // Strong CHoCH (no 'weak') unlocks signal
+    else if (primary.choch && !primary.choch.label.includes('weak')) {
+      if (primary.choch.direction === 'Bullish' && mtfBias !== 'Bearish') {
+        side = 'LONG';
+      } else if (primary.choch.direction === 'Bearish' && mtfBias !== 'Bullish') {
+        side = 'SHORT';
+      }
     }
+    // Weak CHoCH, BOS only, sweep only = WAIT
   }
-
-  if (!smcOverride) {
-    if (derivativesRule.actionSide === 'LONG'  && (mtfBias === 'Bearish') && !primary.sweepLow)  side = 'WAIT';
-    if (derivativesRule.actionSide === 'SHORT' && (mtfBias === 'Bullish') && !primary.sweepHigh) side = 'WAIT';
-  }
+  // derivativesRule.skip forces WAIT regardless
   if (derivativesRule.skip) side = 'WAIT';
 
+  /* ─── STEP 2: Entry / stop / TP calculation ─── */
   const price = primary.last?.close || row.price || 0;
   const a = primary.atr || price * 0.01;
   let entry, stop, tp1, tp2, tp3, rr;
 
   if (side === 'LONG') {
-    const demand   = Math.max(primary.recentLow.price, price - a * 1.15);
-    const fvgEntry = primary.fvg && primary.fvg.side === 'Bullish' ? (primary.fvg.low + primary.fvg.high) / 2 : demand + a * 0.18;
-    entry = clamp(fvgEntry, price - a * 1.45, price + a * 0.25);
+    // FIX 6: Try displacement candle 50% body first
+    const dispCandle = findDisplacementCandle(primary._candles || [], 'LONG', a);
+    let entryZone;
+    if (dispCandle) {
+      entryZone = (dispCandle.open + dispCandle.close) / 2;
+    } else if (primary.fvg && primary.fvg.side === 'Bullish') {
+      entryZone = (primary.fvg.low + primary.fvg.high) / 2;
+    } else {
+      entryZone = primary.recentLow.price + a * 0.2;
+    }
+    entry = clamp(entryZone, price - a * 1.45, price + a * 0.25);
     stop  = Math.min(primary.recentLow.price - a * 0.35, entry - a * 0.72);
     const risk = Math.max(entry - stop, a * 0.35, Number.EPSILON);
     const rawTargets = [Math.max(primary.recentHigh.price, entry + risk * 1.1), entry + risk * 2.0, entry + risk * 3.0].filter(t => t > entry).sort((x,y) => x-y);
@@ -2581,9 +2444,17 @@ function deriveTrade(row, primary, higherAnalyses, tf) {
     tp3 = rawTargets[2] ?? entry + risk * 3.0;
     rr  = (tp2 - entry) / Math.max(entry - stop, Number.EPSILON);
   } else if (side === 'SHORT') {
-    const supply   = Math.min(primary.recentHigh.price, price + a * 1.15);
-    const fvgEntry = primary.fvg && primary.fvg.side === 'Bearish' ? (primary.fvg.low + primary.fvg.high) / 2 : supply - a * 0.18;
-    entry = clamp(fvgEntry, price - a * 0.25, price + a * 1.45);
+    // FIX 6: Try displacement candle 50% body first
+    const dispCandle = findDisplacementCandle(primary._candles || [], 'SHORT', a);
+    let entryZone;
+    if (dispCandle) {
+      entryZone = (dispCandle.open + dispCandle.close) / 2;
+    } else if (primary.fvg && primary.fvg.side === 'Bearish') {
+      entryZone = (primary.fvg.low + primary.fvg.high) / 2;
+    } else {
+      entryZone = primary.recentHigh.price - a * 0.2;
+    }
+    entry = clamp(entryZone, price - a * 0.25, price + a * 1.45);
     stop  = Math.max(primary.recentHigh.price + a * 0.35, entry + a * 0.72);
     const risk = Math.max(stop - entry, a * 0.35, Number.EPSILON);
     const rawTargets = [Math.min(primary.recentLow.price, entry - risk * 1.1), entry - risk * 2.0, entry - risk * 3.0].filter(t => t < entry).sort((x,y) => y-x);
@@ -2595,33 +2466,49 @@ function deriveTrade(row, primary, higherAnalyses, tf) {
     entry = NaN; stop = NaN; tp1 = NaN; tp2 = NaN; tp3 = NaN; rr = 0;
   }
 
+  /* ─── STEP 3: STRUCTURE-FIRST SCORING ─── */
   let score = 0;
-  if (primary.bias !== 'Range') score += 15;
-  if (mtfBias !== 'Mixed' && mtfBias !== 'Ranging' && mtfBias === primary.bias) score += 18;
-  if (mtfBias === 'Ranging') score += 4;
 
+  // Structure event — carries the most weight
   if (primary.mss) {
-    score += primary.mss.confidence === 'High' ? 22 : 16;
+    score += primary.mss.confidence === 'High' ? 35 : 28;
   } else if (primary.choch) {
-    const isStrong = !primary.choch.label.includes('weak');
-    score += isStrong ? 16 : 8;
+    score += primary.choch.label.includes('weak') ? 8 : 25;
   } else if (primary.bos) {
     score += 8;
   }
 
-  if (primary.sweepLow || primary.sweepHigh) score += 10;
-  const dispAligned = (side === 'LONG'  && primary.last?.close > primary.last?.open)
-                   || (side === 'SHORT' && primary.last?.close < primary.last?.open);
-  if (primary.displacement && dispAligned) score += 9;
-  if (primary.fvg) score += 8;
-  if (row.oiChange > 0.002) score += 8;
-  if (row.volume > 250000000) score += 5;
-  if (derivativesRule.actionSide === 'LONG' || derivativesRule.actionSide === 'SHORT') score += 12;
-  if ((side === 'SHORT' && crowdLong) || (side === 'LONG' && crowdShort)) score += 6;
-  if (smcOverride && side !== 'WAIT') score += 5;
-  if (derivativesRule.skip) score = 0;
+  // HTF alignment
+  if (mtfBias !== 'Mixed' && mtfBias !== 'Ranging' && mtfBias === primary.bias) {
+    score += 20;
+  } else if (mtfBias === 'Mixed') {
+    score += 3;
+  }
+  // Ranging HTF = 0 bonus
 
-  // FIX T3: candlestick pattern confluence scoring
+  // Sweep
+  if (primary.sweepLow || primary.sweepHigh) score += 8;
+
+  // Sweep + displacement together (extra bonus for full sequence)
+  if ((primary.sweepLow || primary.sweepHigh) && primary.displacement) {
+    score += 10;
+  } else if (primary.displacement) {
+    score += 7;
+  }
+
+  // FIX 4: volumeExpansion now used in scoring
+  if (primary.volumeExpansion > 2.5 && primary.displacement) {
+    score += 11;
+  } else if (primary.volumeExpansion > 1.8 && primary.displacement) {
+    score += 7;
+  } else if (primary.volumeExpansion > 1.5) {
+    score += 3;
+  }
+
+  // FVG
+  if (primary.fvg) score += 10;
+
+  // Candlestick patterns — cap at +8 (reduced from +12)
   const patterns = primary.candlePatterns || [];
   const alignedPatterns = patterns.filter(p =>
     p.direction === 'Neutral' ||
@@ -2629,85 +2516,109 @@ function deriveTrade(row, primary, higherAnalyses, tf) {
     (side === 'SHORT' && p.direction === 'Bearish')
   );
   const patternScore = alignedPatterns.reduce((s, p) => s + p.strength, 0);
-  score += Math.min(patternScore * 3, 12); // cap pattern bonus at +12
+  score += Math.min(patternScore * 3, 8);
 
-  score = clamp(Math.round(score / 1.3), 0, 100);
+  /* ─── STEP 4: DERIVATIVES as adjustment only (max ±13) ─── */
+  let derivAdj = 0;
 
-  const reasons = [
-    'Derivatives rule: ' + derivativesRule.scenario + ' = ' + derivativesRule.interpretation + ' | Trade chance: ' + derivativesRule.tradeChance,
-    'Derivatives logic: ' + derivativesRule.marketLogic,
-    primary.bias + ' market structure on selected timeframe',
-    'Trend state: ' + primary.trend + ' | Structure event: ' + primary.structureEvent,
-    'MTF bias: ' + mtfBias + ' from ' + higherAnalyses.map(a => a.interval + ' ' + a.bias).join(', ')
-  ];
+  if (side !== 'WAIT') {
+    // Funding aligned with direction
+    if (side === 'LONG'  && row.funding < 0) derivAdj += 3;
+    if (side === 'SHORT' && row.funding > 0) derivAdj += 3;
 
+    // Funding strongly against direction (penalty)
+    if (side === 'LONG'  && row.funding > config.fundingThreshold) derivAdj -= 5;
+    if (side === 'SHORT' && row.funding < -config.fundingThreshold) derivAdj -= 5;
+
+    // OI rising with direction
+    if (side === 'LONG'  && row.oiChange > 0.002) derivAdj += 2;
+    if (side === 'SHORT' && row.oiChange > 0.002) derivAdj += 1;
+
+    // Contrarian crowd positioning
+    if (side === 'SHORT' && crowdLong)  derivAdj += 2;
+    if (side === 'LONG'  && crowdShort) derivAdj += 2;
+  }
+
+  derivAdj = clamp(derivAdj, -8, 5);
+  score += derivAdj;
+
+  // Hard zero for skip
+  if (derivativesRule.skip) score = 0;
+
+  // Final clamp — NO division by 1.3 (removed artificial suppression)
+  score = clamp(Math.round(score), 0, 100);
+
+  /* ─── STEP 5: Build reasons array — structure first ─── */
+  const reasons = [];
+
+  // Structure reasons come first
   if (primary.mss) {
-    reasons.unshift('MSS (' + primary.mss.direction + ') confirmed · ' + primary.mss.trigger + ' · Confidence: ' + primary.mss.confidence);
+    reasons.push('✦ MSS (' + primary.mss.direction + ') confirmed · ' + primary.mss.trigger + ' · Confidence: ' + primary.mss.confidence);
   }
   if (primary.choch) {
-    reasons.unshift('CHoCH (' + primary.choch.direction + ') detected · ' + primary.choch.trigger);
+    const strength = primary.choch.label.includes('weak') ? '(weak — no sweep)' : '(strong — sweep confirmed)';
+    reasons.push('✦ CHoCH (' + primary.choch.direction + ') ' + strength + ' · ' + primary.choch.trigger);
   }
   if (primary.bos && !primary.mss && !primary.choch) {
-    reasons.push('BOS (' + primary.bos.direction + ') · Close through ' + fmtPrice(primary.bos.level) + ' — structure continuation');
+    reasons.push('BOS (' + primary.bos.direction + ') · Close through ' + fmtPrice(primary.bos.level) + ' — structure continuation only');
   }
+
+  reasons.push(primary.bias + ' market structure on selected timeframe · Trend: ' + primary.trend);
+  reasons.push('MTF bias: ' + mtfBias + ' from ' + higherAnalyses.map(a => a.interval + ' ' + a.bias).join(', '));
+
   if (primary.sweepLow)  reasons.push('Sell-side liquidity sweep near ' + fmtPrice(primary.recentLow.price));
   if (primary.sweepHigh) reasons.push('Buy-side liquidity sweep near ' + fmtPrice(primary.recentHigh.price));
-  if (primary.fvg)       reasons.push(primary.fvg.side + ' fair value gap: ' + fmtPrice(primary.fvg.low) + '–' + fmtPrice(primary.fvg.high));
+  if (primary.displacement) reasons.push('Displacement candle confirmed — body > 65% ATR · Volume expansion: ' + primary.volumeExpansion.toFixed(2) + 'x');
+  if (primary.fvg) reasons.push(primary.fvg.side + ' fair value gap: ' + fmtPrice(primary.fvg.low) + '–' + fmtPrice(primary.fvg.high) + ' (valid to midpoint)');
+
+  // Candle patterns
+  if (patterns.length > 0) {
+    const bullPats = patterns.filter(p => p.direction === 'Bullish').map(p => p.name);
+    const bearPats = patterns.filter(p => p.direction === 'Bearish').map(p => p.name);
+    const neutPats = patterns.filter(p => p.direction === 'Neutral').map(p => p.name);
+    if (bullPats.length) reasons.push('Bullish candle pattern(s): ' + bullPats.join(', '));
+    if (bearPats.length) reasons.push('Bearish candle pattern(s): ' + bearPats.join(', '));
+    if (neutPats.length) reasons.push('Indecision pattern(s): ' + neutPats.join(', '));
+  }
+
+  // Derivatives — listed LAST as cherry on top
+  reasons.push('— Derivatives (confluence only) —');
+  reasons.push('Derivatives context: ' + derivativesRule.scenario + ' · ' + derivativesRule.interpretation);
+  reasons.push('Derivatives logic: ' + derivativesRule.marketLogic);
   if (row.oiChange > 0.002)  reasons.push('Open interest rising — fresh positioning entering');
   if (row.oiChange < -0.002) reasons.push('Open interest falling — deleveraging risk present');
-  if (row.funding < 0) reasons.push('Negative funding: shorts paying longs');
-  if (row.funding > 0) reasons.push('Positive funding: longs paying shorts');
-  if (crowdLong)  reasons.push('Long-heavy crowd; watch for long liquidation traps');
-  if (crowdShort) reasons.push('Short-heavy crowd; watch for short squeeze reversals');
-
-  // FIX T3: candlestick pattern reasons (reuse 'patterns' declared above)
-  if (patterns.length > 0) {
-    const bullPats  = patterns.filter(p => p.direction === 'Bullish').map(p => p.name);
-    const bearPats  = patterns.filter(p => p.direction === 'Bearish').map(p => p.name);
-    const neutPats  = patterns.filter(p => p.direction === 'Neutral').map(p => p.name);
-    if (bullPats.length)  reasons.push('Bullish candle pattern(s): ' + bullPats.join(', '));
-    if (bearPats.length)  reasons.push('Bearish candle pattern(s): ' + bearPats.join(', '));
-    if (neutPats.length)  reasons.push('Indecision pattern(s): ' + neutPats.join(', '));
-  }
+  if (row.funding < 0) reasons.push('Negative funding: shorts paying longs (bullish lean)');
+  if (row.funding > 0) reasons.push('Positive funding: longs paying shorts (bearish lean)');
+  if (crowdLong)  reasons.push('Long-heavy crowd: watch for long liquidation traps');
+  if (crowdShort) reasons.push('Short-heavy crowd: watch for short squeeze reversals');
+  if (derivAdj > 0) reasons.push('Derivatives score adjustment: +' + derivAdj + ' pts added');
+  if (derivAdj < 0) reasons.push('Derivatives score adjustment: ' + derivAdj + ' pts (funding against direction)');
 
   const invalidation = side === 'LONG'
     ? 'Invalidates on acceptance below sell-side liquidity and stop zone.'
     : side === 'SHORT'
       ? 'Invalidates on acceptance above buy-side liquidity and stop zone.'
-      : 'No active setup — wait for MSS, CHoCH, or sweep with displacement.';
+      : 'No active setup — wait for MSS or strong CHoCH with sweep to unlock a signal.';
 
-  // BUG 2 FIX: surface contra-derivatives warning when SMC overrides derivatives
-  const contraDerivatives = smcOverride
+  // Contra-derivatives: SMC overrides derivatives direction
+  const contraDerivatives = side !== 'WAIT'
     && derivativesRule.actionSide !== 'WAIT'
     && derivativesRule.actionSide !== side;
+
   if (contraDerivatives) {
     reasons.unshift(
-      '⚠ CONTRA-DERIVATIVES: SMC structure override active — derivatives engine signalled '
-      + derivativesRule.actionSide + ' (' + derivativesRule.scenario + ': ' + derivativesRule.interpretation
-      + '). Structure confluence overrode it. Reduce size and require strong confirmation before entry.'
+      '⚠ CONTRA-DERIVATIVES: Structure-first signal (' + side + ') conflicts with derivatives engine (' + derivativesRule.actionSide + ': ' + derivativesRule.scenario + '). Structure wins. Reduce size and require strong confirmation.'
     );
   }
 
-  return { side, entry, stop, tp1, tp2, tp3, rr, score, mtfBias, derivativesRule,
-    reasons, invalidation, smcOverride, contraDerivatives };
+  return {
+    side, entry, stop, tp1, tp2, tp3, rr, score, mtfBias, derivativesRule,
+    reasons, invalidation, smcOverride: false, contraDerivatives, derivAdj
+  };
 }
 
 /* ══════════════════════════════════════
-   LEVEL CONTEXT VALIDATOR  (Bugs 3/4/5 fix)
-   Replaces the old checkLevelHistory() which scanned backwards
-   through price history and produced false positives (stop
-   "swept" just because price rose through it, entry "visited"
-   just because price had to travel through it to get here).
-
-   This function is FORWARD-LOOKING only — it checks current
-   price position relative to the freshly-calculated levels.
-   No historical candle scanning. No false sweeps.
-
-   Returns:
-     entry: 'live' | 'approaching' | 'entry_missed' | 'clean' | 'n/a'
-     entryMissedPct: number (% price has moved past entry) | null
-     stop:  'n/a' (no longer assessed — stop is always valid if set)
-     tp1/tp2: 'n/a'
+   LEVEL CONTEXT VALIDATOR (forward-looking only)
 ══════════════════════════════════════ */
 function checkLevelContext(candles, trade) {
   const empty = { entry: 'n/a', stop: 'n/a', tp1: 'n/a', tp2: 'n/a',
@@ -2718,40 +2629,27 @@ function checkLevelContext(candles, trade) {
   const currentPrice = candles[candles.length - 1].close;
   const entry = trade.entry;
   const atrVal = trade._atr || Math.abs(entry - trade.stop) || entry * 0.005;
-  const approachThreshold = atrVal * 0.5; // within 0.5 ATR = approaching
-  const missedBuffer = 0.005; // 0.5% past entry = missed
+  const approachThreshold = atrVal * 0.5;
+  const missedBuffer = 0.005;
 
   let entryStatus = 'clean';
   let entryMissedPct = null;
 
   if (trade.side === 'LONG') {
-    // For LONG: entry is below current price (we want price to come DOWN to it)
     if (currentPrice <= entry * (1 + missedBuffer)) {
-      // Price is at or below entry → setup is live or already passed through
-      if (currentPrice <= entry) {
-        entryStatus = 'live'; // price is at/below entry zone — ideal, looking for bounce
-      } else {
-        entryStatus = 'approaching'; // within 0.5% above entry
-      }
+      entryStatus = currentPrice <= entry ? 'live' : 'approaching';
     } else if (currentPrice <= entry + approachThreshold) {
-      entryStatus = 'approaching'; // within 0.5 ATR above entry
+      entryStatus = 'approaching';
     } else if (currentPrice > entry * (1 + missedBuffer)) {
-      // Price is well above entry — entry zone is behind price, setup missed
       entryStatus = 'entry_missed';
       entryMissedPct = ((currentPrice - entry) / entry) * 100;
     }
   } else if (trade.side === 'SHORT') {
-    // For SHORT: entry is above current price (we want price to come UP to it)
     if (currentPrice >= entry * (1 - missedBuffer)) {
-      if (currentPrice >= entry) {
-        entryStatus = 'live'; // price is at/above entry zone
-      } else {
-        entryStatus = 'approaching';
-      }
+      entryStatus = currentPrice >= entry ? 'live' : 'approaching';
     } else if (currentPrice >= entry - approachThreshold) {
       entryStatus = 'approaching';
     } else if (currentPrice < entry * (1 - missedBuffer)) {
-      // Price is well below entry — entry zone is behind price, setup missed
       entryStatus = 'entry_missed';
       entryMissedPct = ((entry - currentPrice) / entry) * 100;
     }
@@ -2763,23 +2661,31 @@ function checkLevelContext(candles, trade) {
 
 /* ══════════════════════════════════════
    ANALYZE ROW
+   Pass candles into primary._candles so
+   findDisplacementCandle() can access them
 ══════════════════════════════════════ */
 async function analyzeRow(row, tf) {
   const config     = tfMap[tf];
   const intervals  = [tf].concat(config.higher);
   const candleSets = await Promise.all(intervals.map(interval => fetchCandles(row.symbol, interval, config.limit)));
-  const analyses   = candleSets.map((candles, i) => { const an = analyzeStructure(candles, intervals[i]); an.interval = intervals[i]; an.candles = candles; return an; });
+  const analyses   = candleSets.map((candles, i) => {
+    const an = analyzeStructure(candles, intervals[i]);
+    an.interval = intervals[i];
+    an.candles  = candles;
+    // FIX 6: attach raw candles to primary for displacement candle lookup
+    if (i === 0) an._candles = candles;
+    return an;
+  });
   const primary    = analyses[0];
   const trade      = deriveTrade(row, primary, analyses.slice(1), tf);
-  // Bugs 3/4/5 fix: replaced checkLevelHistory with checkLevelContext (forward-looking only)
   const levelHistory = checkLevelContext(candleSets[0], trade);
-  row.analysis       = { primary, higher: analyses.slice(1), trade, candles: candleSets[0], levelHistory };
-  row.score          = trade.score;
-  row.side           = trade.side;
-  row.bias           = primary.bias;
-  row.trend          = primary.trend;
+  row.analysis     = { primary, higher: analyses.slice(1), trade, candles: candleSets[0], levelHistory };
+  row.score        = trade.score;
+  row.side         = trade.side;
+  row.bias         = primary.bias;
+  row.trend        = primary.trend;
   row.structureEvent = primary.structureEvent;
-  row._scanTf        = tf;
+  row._scanTf      = tf;
   return row;
 }
 
@@ -2965,24 +2871,12 @@ function selectRow(symbol) {
 
 /* ══════════════════════════════════════
    RENDER DETAIL
-   ─────────────────────────────────────
-   FIX 1: levelCell is declared HERE at the TOP of the function,
-   before any use. Previously it was declared AFTER the
-   executionSection if/else block that already called it,
-   causing a TDZ ReferenceError ("Cannot access 'levelCell'
-   before initialisation") which crashed the drawer on every
-   market-scan row click.
-
-   FIX 2: In the WAIT diagnostic block, `bias` was referenced
-   as a bare variable (undefined). Corrected to `primary.bias`.
 ══════════════════════════════════════ */
 function renderDetail(row, targetEl, tf) {
   const { primary, higher, trade, candles, levelHistory } = row.analysis;
   const resolvedTf = tf || row._scanTf || el.timeframe.value;
   const lh = levelHistory || {};
 
-  /* ─── FIX 1: levelCell declared at top of function ─── */
-  // Entry context badge for levelCell labels
   const lhBadge = (status) => {
     if (!status || status === 'clean' || status === 'n/a') return '';
     if (status === 'entry_missed')
@@ -3005,23 +2899,21 @@ function renderDetail(row, targetEl, tf) {
   };
 
   const sideClass  = trade.side === 'LONG' ? 'b-buy' : trade.side === 'SHORT' ? 'b-sell' : 'b-wait';
-  const fvgText    = primary.fvg ? primary.fvg.side + ' FVG · ' + fmtPrice(primary.fvg.low) + ' – ' + fmtPrice(primary.fvg.high) : 'None nearby';
+  const fvgText    = primary.fvg ? primary.fvg.side + ' FVG · ' + fmtPrice(primary.fvg.low) + ' – ' + fmtPrice(primary.fvg.high) + ' (valid to midpoint)' : 'None nearby';
   const dirWord    = trade.side === 'LONG' ? 'buy' : trade.side === 'SHORT' ? 'sell' : 'stand aside';
   const triggerTxt = trade.side === 'WAIT'
-    ? 'Wait for a liquidity sweep, displacement candle, and aligned HTF bias.'
-    : 'Wait for price to trade into the entry zone, then confirm with rejection or displacement.';
+    ? 'Wait for MSS or strong CHoCH (with sweep) to unlock a signal.'
+    : 'Wait for price to trade into the entry zone, then confirm with rejection or displacement candle.';
   const riskTxt = trade.side === 'LONG'
     ? 'Invalid if price accepts below the stop zone and sell-side liquidity.'
     : trade.side === 'SHORT'
       ? 'Invalid if price accepts above the stop zone and buy-side liquidity.'
-      : 'No active risk plan until a directional setup appears.';
+      : 'No active risk plan until MSS or strong CHoCH confirmed.';
 
-  // SVG score ring (score is now /100)
   const radius = 28, circ = 2 * Math.PI * radius;
   const arc = clamp((trade.score / 100) * circ, 0, circ);
   const ringColor = trade.score >= 65 ? '#00e676' : trade.score >= 45 ? '#ffd54f' : '#5a6470';
 
-  // Build the execution plan section
   let executionSection = '';
 
   if (trade.side === 'WAIT') {
@@ -3029,46 +2921,45 @@ function renderDetail(row, targetEl, tf) {
     const watchItems   = [];
     const htfLabels    = higher.map(a => a.interval + ' ' + a.bias).join(' · ');
 
-    if (trade.mtfBias === 'Mixed') {
-      missingItems.push('HTF bias is <b>conflicted</b> (' + htfLabels + ') — need alignment before any entry');
-    } else if (trade.mtfBias === 'Ranging') {
-      missingItems.push('Higher timeframes are <b>ranging</b> (' + htfLabels + ') — no directional edge yet');
+    // TIER 1: Structure missing
+    if (!primary.mss && !primary.choch) {
+      missingItems.push('<b>No MSS or CHoCH detected</b> — the primary signal unlocking event has not occurred yet');
+    } else if (primary.choch && primary.choch.label.includes('weak')) {
+      missingItems.push('<b>CHoCH is weak</b> (no sweep before it) — need a liquidity sweep to precede the CHoCH for it to qualify');
     }
 
     if (!primary.sweepLow && !primary.sweepHigh) {
-      missingItems.push('<b>No liquidity sweep</b> detected — price hasn\'t engineered a trap move yet');
+      missingItems.push('<b>No liquidity sweep</b> detected — price needs to engineer a trap move first');
     }
 
+    // TIER 2: Entry trigger missing
     if (!primary.displacement) {
-      missingItems.push('<b>No displacement candle</b> — waiting for a strong, decisive move away from range');
+      missingItems.push('<b>No displacement candle</b> — waiting for a strong, decisive move away from range (body > 65% ATR)');
     }
 
-    if (trade.derivativesRule.skip) {
-      missingItems.push('Derivatives filter flagged <b>' + trade.derivativesRule.scenario + '</b> — setup is disqualified until conditions reset');
-    }
-
-    if (!primary.mss && !primary.choch) {
-      missingItems.push('<b>No MSS or CHoCH</b> — structure has not shifted; no confirmed reversal signal yet');
-    } else if (primary.choch && primary.choch.label.includes('weak')) {
-      missingItems.push('CHoCH is <b>unconfirmed (weak)</b> — no sweep preceded it; wait for MSS to form');
-    }
-    if (!primary.bos && !primary.mss) {
-      missingItems.push('<b>No BOS</b> — no structural break in either direction to follow');
+    // HTF issues
+    if (trade.mtfBias === 'Ranging') {
+      missingItems.push('Higher timeframes are <b>ranging</b> (' + htfLabels + ') — no directional HTF edge, WAIT is forced');
+    } else if (trade.mtfBias === 'Mixed') {
+      missingItems.push('HTF bias is <b>conflicted</b> (' + htfLabels + ') — without MSS, conflicting HTF forces WAIT');
     }
 
     if (primary.bias === 'Range') {
-      missingItems.push('Market structure is in <b>equilibrium / range</b> — no clear bias to trade with');
+      missingItems.push('Market structure is in <b>equilibrium / range</b> on the selected timeframe');
     }
 
+    if (derivativesRule && derivativesRule.skip) {
+      missingItems.push('Derivatives filter: <b>' + trade.derivativesRule.scenario + '</b> — manipulation risk flagged');
+    }
+
+    // What to watch for
     if (!primary.mss) {
-      watchItems.push('MSS formation: sweep of liquidity → CHoCH candle → BOS in new direction = full structure shift');
+      watchItems.push('MSS formation: SSL/BSL sweep → displacement candle → CHoCH → BOS in new direction');
     }
     if (!primary.choch || primary.choch.label.includes('weak')) {
-      /* ─── FIX 2: was `bias` (undefined) — corrected to `primary.bias` ─── */
       const chochDir = primary.bias === 'Bearish' ? 'bullish' : 'bearish';
-      watchItems.push('CHoCH trigger: a ' + chochDir + ' close beyond a prior swing after a liquidity sweep');
+      watchItems.push('Strong CHoCH trigger: a ' + chochDir + ' close beyond the most recent ' + (chochDir === 'bullish' ? 'Lower High' : 'Higher Low') + ' AFTER a liquidity sweep');
     }
-
     if (!primary.sweepLow) {
       watchItems.push('SSL sweep: price dips below <b>' + fmtPrice(primary.recentLow.price) + '</b> then closes back above it');
     }
@@ -3079,10 +2970,10 @@ function renderDetail(row, targetEl, tf) {
       watchItems.push('HTF alignment: ' + higher.map(a => a.interval).join(' + ') + ' need to agree on a direction');
     }
     if (!primary.displacement) {
-      watchItems.push('Displacement: a candle >&nbsp;65% of ATR (' + fmtPrice(primary.atr * 0.65) + ') closing away from range');
+      watchItems.push('Displacement: a candle body >&nbsp;65% of ATR (' + fmtPrice(primary.atr * 0.65) + ') closing away from range');
     }
     if (primary.fvg) {
-      watchItems.push('FVG reaction: price retests the ' + primary.fvg.side + ' gap ' + fmtPrice(primary.fvg.low) + '–' + fmtPrice(primary.fvg.high) + ' with rejection');
+      watchItems.push('FVG reaction: price retests the ' + primary.fvg.side + ' gap ' + fmtPrice(primary.fvg.low) + '–' + fmtPrice(primary.fvg.high) + ' midpoint (' + fmtPrice((primary.fvg.low + primary.fvg.high) / 2) + ') with rejection');
     }
 
     executionSection = `
@@ -3095,9 +2986,9 @@ function renderDetail(row, targetEl, tf) {
         <span class="badge b-wait">NO TRADE</span>
       </div>
 
-      <div style="padding:12px 13px 4px; border-bottom:1px solid var(--border); background:rgba(255,213,79,0.04);">
+      <div style="padding:10px 13px 4px; border-bottom:1px solid var(--border); background:rgba(255,213,79,0.04);">
         <div style="font-family:'Syne',sans-serif; font-weight:700; font-size:9px; letter-spacing:0.12em; text-transform:uppercase; color:var(--gold); margin-bottom:8px;">
-          ⚠ Why we're waiting
+          ⚠ Why we're waiting — structure check
         </div>
         <ul style="list-style:none; font-size:11px; color:var(--sub); line-height:1.75; padding:0;">
           ${missingItems.length
@@ -3113,7 +3004,7 @@ function renderDetail(row, targetEl, tf) {
         <ul style="list-style:none; font-size:11px; color:var(--sub); line-height:1.75; padding:0;">
           ${watchItems.length
             ? watchItems.map(w => `<li style="display:flex;gap:7px;align-items:baseline;margin-bottom:3px;"><span style="color:rgba(0,230,118,0.5);flex-shrink:0;">→</span><span>${w}</span></li>`).join('')
-            : `<li style="color:var(--muted);">Monitor structure for a sweep or BOS event.</li>`}
+            : `<li style="color:var(--muted);">Monitor structure for a sweep or MSS event.</li>`}
         </ul>
       </div>
 
@@ -3134,27 +3025,21 @@ function renderDetail(row, targetEl, tf) {
     </div>`;
 
   } else {
-    // Normal LONG / SHORT ticket
-    // BUG 2 FIX: contra-derivatives warning banner
     const contraBannerHtml = trade.contraDerivatives ? `
       <div style="padding:10px 13px; border-bottom:1px solid rgba(255,140,0,0.3); background:rgba(255,140,0,0.07);">
         <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:#ff8c00;margin-bottom:6px;">⚠ CONTRA-DERIVATIVES TRADE</div>
         <div style="font-size:11px;color:var(--sub);line-height:1.65;">
-          MSS/CHoCH structure override is active. Derivatives engine signalled
-          <b style="color:#ff8c00;">${trade.derivativesRule.actionSide}</b>
-          (${trade.derivativesRule.scenario} · ${trade.derivativesRule.interpretation}).
-          Structure confluence overrode it.<br>
-          <span style="color:#ff8c00;font-weight:600;">→ Reduce position size. Require strong confirmation candle before entry.</span>
+          Structure-first signal: <b style="color:${trade.side === 'LONG' ? 'var(--green)' : 'var(--red)'};">${trade.side}</b>. Derivatives engine said <b style="color:#ff8c00;">${trade.derivativesRule.actionSide}</b> (${trade.derivativesRule.scenario} · ${trade.derivativesRule.interpretation}).<br>
+          <span style="color:#ff8c00;font-weight:600;">→ Structure wins. Reduce position size. Require strong confirmation candle before entry.</span>
         </div>
       </div>` : '';
 
-    // BUG 3/4/5 FIX: level context (forward-looking only — no history audit)
     const lhWarnings = [];
     if (lh.entry === 'entry_missed') {
       const pctAway = lh.entryMissedPct ? Math.abs(lh.entryMissedPct).toFixed(2) : '?';
-      lhWarnings.push(`<li style="color:var(--red);"><b>🚫 Entry zone already passed</b> — price has moved ${pctAway}% beyond entry zone. Consider waiting for a pullback to re-test the zone, or skip this setup.</li>`);
+      lhWarnings.push(`<li style="color:var(--red);"><b>🚫 Entry zone already passed</b> — price has moved ${pctAway}% beyond entry zone. Wait for pullback or skip.</li>`);
     } else if (lh.entry === 'approaching') {
-      lhWarnings.push(`<li style="color:var(--green);"><b>✅ Entry zone approaching</b> — price is within reach of the entry zone. Monitor for trigger confirmation.</li>`);
+      lhWarnings.push(`<li style="color:var(--green);"><b>✅ Entry zone approaching</b> — price is within reach. Monitor for trigger confirmation.</li>`);
     } else if (lh.entry === 'live') {
       lhWarnings.push(`<li style="color:var(--cyan);"><b>◎ Setup is live</b> — price is at or inside the entry zone now.</li>`);
     }
@@ -3188,7 +3073,7 @@ function renderDetail(row, targetEl, tf) {
             <li><b>Action:</b> Prepare a ${dirWord} inside the entry zone.</li>
             <li><b>Confirmation:</b> ${triggerTxt}</li>
             <li><b>Invalidation:</b> ${riskTxt}</li>
-            <li><b>Derivatives:</b> ${trade.derivativesRule.scenario} · ${trade.derivativesRule.interpretation}</li>
+            <li><b>Derivatives context:</b> ${trade.derivativesRule.scenario} · ${trade.derivativesRule.interpretation} (confluence only)</li>
           </ul>
         </div>
         <div class="ticket-col">
@@ -3203,7 +3088,7 @@ function renderDetail(row, targetEl, tf) {
     </div>`;
   }
 
-  /* ══ FIX T2: Build SMC Structure Levels block ══ */
+  // SMC Structure Levels
   const smcLevelRows = [];
   if (primary.mss) {
     smcLevelRows.push({ lbl: primary.mss.label + ' Pivot', val: primary.mss.direction === 'Bullish' ? primary.prevHigh.price : primary.prevLow.price, color: primary.mss.direction === 'Bullish' ? 'var(--green)' : 'var(--red)', note: primary.mss.trigger });
@@ -3212,11 +3097,11 @@ function renderDetail(row, targetEl, tf) {
     smcLevelRows.push({ lbl: primary.choch.label + ' Level', val: primary.choch.level, color: primary.choch.direction === 'Bullish' ? 'var(--green)' : 'var(--red)', note: primary.choch.trigger });
   }
   if (primary.bos) {
-    smcLevelRows.push({ lbl: primary.bos.label + ' Level', val: primary.bos.level, color: primary.bos.direction === 'Bullish' ? 'var(--green)' : 'var(--red)', note: 'Close through this level = structure continuation' });
+    smcLevelRows.push({ lbl: primary.bos.label + ' Level', val: primary.bos.level, color: primary.bos.direction === 'Bullish' ? 'var(--green)' : 'var(--red)', note: 'Close through this level = continuation' });
   }
-  smcLevelRows.push({ lbl: 'Prev Swing High', val: primary.prevHigh.price, color: 'var(--cyan)',  note: 'Prior swing high — BOS/CHoCH trigger above this' });
-  smcLevelRows.push({ lbl: 'Prev Swing Low',  val: primary.prevLow.price,  color: 'var(--gold)', note: 'Prior swing low — BOS/CHoCH trigger below this' });
-  smcLevelRows.push({ lbl: 'BSL (Swing High)', val: primary.recentHigh.price, color: 'var(--cyan)',  note: 'Buy-side liquidity — most recent swing high' });
+  smcLevelRows.push({ lbl: 'Most Recent LH', val: primary.mostRecentLowerHigh?.price || primary.prevHigh.price, color: 'var(--red)', note: 'Most recent Lower High — bullish CHoCH trigger above this' });
+  smcLevelRows.push({ lbl: 'Most Recent HL', val: primary.mostRecentHigherLow?.price || primary.prevLow.price, color: 'var(--green)', note: 'Most recent Higher Low — bearish CHoCH trigger below this' });
+  smcLevelRows.push({ lbl: 'BSL (Swing High)', val: primary.recentHigh.price, color: 'var(--cyan)', note: 'Buy-side liquidity — most recent swing high' });
   smcLevelRows.push({ lbl: 'SSL (Swing Low)',  val: primary.recentLow.price,  color: 'var(--gold)', note: 'Sell-side liquidity — most recent swing low' });
 
   const smcLevelsSection = `
@@ -3234,16 +3119,16 @@ function renderDetail(row, targetEl, tf) {
       </div>
     </div>`;
 
-  /* ══ FIX T3: Build Candlestick Patterns block ══ */
-  const patterns = primary.candlePatterns || [];
-  const patternSection = patterns.length > 0 ? `
+  // Candlestick Patterns
+  const patternsList = primary.candlePatterns || [];
+  const patternSection = patternsList.length > 0 ? `
     <div style="border:1px solid var(--border); background:var(--bg3); overflow:hidden;">
       <div style="padding:8px 13px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between;">
         <span style="font-family:'Syne',sans-serif;font-weight:700;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--sub);">◈ Candlestick Patterns</span>
         <span style="font-size:9px;color:var(--muted);">Last 3 candles · strength 1–3</span>
       </div>
       <div style="display:flex;flex-wrap:wrap;gap:1px;background:var(--border);">
-        ${patterns.map(p => {
+        ${patternsList.map(p => {
           const col = p.direction === 'Bullish' ? 'var(--green)' : p.direction === 'Bearish' ? 'var(--red)' : 'var(--gold)';
           const bg  = p.direction === 'Bullish' ? 'rgba(0,230,118,0.06)' : p.direction === 'Bearish' ? 'rgba(255,68,68,0.06)' : 'rgba(255,213,79,0.06)';
           const dots = '●'.repeat(p.strength) + '○'.repeat(3 - p.strength);
@@ -3255,12 +3140,18 @@ function renderDetail(row, targetEl, tf) {
       </div>
     </div>` : '';
 
-  /* ══ FIX T5: Weekly TF label in HTF line ══ */
   const htfLine = higher.map(a => {
     const isWeekly = a.interval === '1w';
     const col = a.bias === 'Bullish' ? 'var(--green)' : a.bias === 'Bearish' ? 'var(--red)' : 'var(--muted)';
     return `<span style="color:${col};font-weight:${isWeekly ? '700' : '400'};">${a.interval.toUpperCase()} <b>${a.bias}</b>${a._insufficient ? ' <span style="color:var(--muted);font-size:9px;">(limited data)</span>' : ''}</span>`;
   }).join(' &nbsp;/&nbsp; ');
+
+  // Derivatives summary badge
+  const derivAdjText = trade.derivAdj > 0
+    ? `<span style="color:var(--green);font-size:10px;">+${trade.derivAdj}pts cherry</span>`
+    : trade.derivAdj < 0
+      ? `<span style="color:var(--red);font-size:10px;">${trade.derivAdj}pts penalty</span>`
+      : `<span style="color:var(--muted);font-size:10px;">neutral</span>`;
 
   targetEl.innerHTML = `
     <div class="detail-meta">
@@ -3284,7 +3175,10 @@ function renderDetail(row, targetEl, tf) {
         <div class="price-sub" style="margin-top:3px;">
           MTF: <b style="color:var(--text)">${trade.mtfBias}</b> &nbsp;·&nbsp; ${htfLine}
         </div>
-        ${trade.side === 'WAIT' ? `<div class="price-sub" style="margin-top:4px;"><span style="color:var(--gold)">⚠ Monitoring — see execution plan below.</span></div>` : ''}
+        <div class="price-sub" style="margin-top:3px;">
+          Derivatives adj: ${derivAdjText} &nbsp;·&nbsp; <span style="font-size:9px;color:var(--muted);">structure carries ${Math.round(((trade.score - (trade.derivAdj || 0)) / Math.max(trade.score, 1)) * 100)}% of score</span>
+        </div>
+        ${trade.side === 'WAIT' ? `<div class="price-sub" style="margin-top:4px;"><span style="color:var(--gold)">⚠ Monitoring — no MSS/CHoCH confirmed yet.</span></div>` : ''}
       </div>
     </div>
 
@@ -3317,7 +3211,7 @@ function renderDetail(row, targetEl, tf) {
       </button>
       <div class="narrative-body" id="narrativeBody">
         <div class="nbox">
-          <h4>Confluence Read</h4>
+          <h4>Confluence Read — Structure First</h4>
           <ul>${trade.reasons.map(r => '<li>' + r + '</li>').join('')}</ul>
         </div>
         <div class="nbox">
@@ -3325,8 +3219,9 @@ function renderDetail(row, targetEl, tf) {
           <ul>
             <li>Prefer limit execution inside the entry zone after confirmation.</li>
             <li>${trade.invalidation}</li>
-            <li>Reduce size when funding, OI, and structure disagree.</li>
-            ${patterns.length > 0 ? `<li>Pattern confluence: ${patterns.map(p => p.name + ' (' + p.direction + ')').join(', ')}.</li>` : ''}
+            <li>Derivatives are confluence only — they cannot generate or flip a signal.</li>
+            <li>Reduce size when funding strongly opposes direction (${trade.derivAdj < -3 ? 'active penalty: ' + trade.derivAdj + 'pts' : 'not currently penalised'}).</li>
+            ${patternsList.length > 0 ? `<li>Pattern confluence: ${patternsList.map(p => p.name + ' (' + p.direction + ')').join(', ')}.</li>` : ''}
           </ul>
         </div>
       </div>
@@ -3342,7 +3237,6 @@ function toggleNarrative() {
   btn.classList.toggle('open', open);
 }
 
-/* Copy to clipboard */
 function copyVal(val, btn) {
   navigator.clipboard?.writeText(val).then(() => {
     const orig = btn.textContent;
@@ -3353,8 +3247,7 @@ function copyVal(val, btn) {
 }
 
 /* ══════════════════════════════════════
-   SIGNAL EXPORT — builds plain-text signal
-   for Telegram / WhatsApp paste
+   SIGNAL EXPORT
 ══════════════════════════════════════ */
 function buildSignalText(row, tf) {
   const { primary, higher, trade, levelHistory } = row.analysis;
@@ -3363,9 +3256,7 @@ function buildSignalText(row, tf) {
   const tfLabel = tfMap[resolvedTf]?.label || resolvedTf.toUpperCase();
   const sideEmoji = trade.side === 'LONG' ? '📈' : '📉';
   const divider = '━━━━━━━━━━━━━━━━━━━━━━━━━━';
-  const thin    = '─────────────────────────';
 
-  // Structure level values
   const smcLine = primary.mss
     ? `🔸 ${primary.mss.label} Pivot:   ${fmtPrice(primary.mss.direction === 'Bullish' ? primary.prevHigh.price : primary.prevLow.price)}`
     : primary.choch
@@ -3374,7 +3265,6 @@ function buildSignalText(row, tf) {
         ? `🔸 ${primary.bos.label} Level:  ${fmtPrice(primary.bos.level)}`
         : '';
 
-  // Entry context lines (forward-looking only)
   const lhLines = [];
   if (lh.entry === 'entry_missed') {
     const pct = lh.entryMissedPct ? Math.abs(lh.entryMissedPct).toFixed(2) : '?';
@@ -3385,36 +3275,35 @@ function buildSignalText(row, tf) {
     lhLines.push(`→ Entry zone approaching — monitor for trigger confirmation.`);
   }
 
-  // Contra-derivatives warning for signal export
   const contraLine = trade.contraDerivatives
-    ? `⚠ CONTRA-DERIVATIVES: Derivatives signalled ${trade.derivativesRule.actionSide} (${trade.derivativesRule.scenario}). Structure override active. Reduce size.`
+    ? `⚠ CONTRA-DERIVATIVES: Structure signal ${trade.side} conflicts with derivatives (${trade.derivativesRule.actionSide}: ${trade.derivativesRule.scenario}). Structure wins. Reduce size.`
     : '';
 
-  // Confluence bullets — clean up HTML tags
   const cleanReasons = trade.reasons
-    .filter(r => !r.startsWith('Derivatives logic:')) // skip verbose line
+    .filter(r => !r.startsWith('Derivatives logic:') && !r.startsWith('—'))
     .map(r => r.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim())
     .filter(r => r.length > 0)
+    .slice(0, 6)
     .map(r => `• ${r}`);
 
-  // Patterns
   const pats = primary.candlePatterns || [];
   const bullPats = pats.filter(p => p.direction === 'Bullish').map(p => p.name);
   const bearPats = pats.filter(p => p.direction === 'Bearish').map(p => p.name);
   const patLine = bullPats.length ? `• Bullish pattern(s): ${bullPats.join(', ')}`
     : bearPats.length ? `• Bearish pattern(s): ${bearPats.join(', ')}` : '';
 
-  // HTF line
   const htfText = higher.map(a => `${a.interval.toUpperCase()} ${a.bias}`).join(' · ');
-
-  // FVG
   const fvgLine = primary.fvg
-    ? `🔸 FVG (${primary.fvg.side}): ${fmtPrice(primary.fvg.low)} – ${fmtPrice(primary.fvg.high)}`
+    ? `🔸 FVG (${primary.fvg.side}): ${fmtPrice(primary.fvg.low)} – ${fmtPrice(primary.fvg.high)} (midpoint: ${fmtPrice((primary.fvg.low + primary.fvg.high)/2)})`
     : '';
+
+  const derivNote = trade.derivAdj !== 0
+    ? `Deriv adj: ${trade.derivAdj > 0 ? '+' : ''}${trade.derivAdj}pts (cherry on top)`
+    : `Deriv: neutral`;
 
   const lines = [
     divider,
-    `📡 ATL SCANNER SIGNAL`,
+    `📡 ATL SCANNER SIGNAL — Structure First`,
     divider,
     `🪙 ${row.symbol}  |  ${tfLabel}  |  Score: ${trade.score}/100`,
     `${sideEmoji} SIGNAL: ${trade.side}`,
@@ -3428,31 +3317,32 @@ function buildSignalText(row, tf) {
     `🎯 TP3 (Runner):  ${fmtPrice(trade.tp3)}`,
     `⚖️ R:R (TP2):     ${trade.rr ? trade.rr.toFixed(2) + 'R' : '—'}`,
     ``,
-    `━━━ STRUCTURE ━━━`,
+    `━━━ STRUCTURE (Signal Source) ━━━`,
     ...(smcLine ? [smcLine] : []),
-    `🔸 Prev Swing Hi: ${fmtPrice(primary.prevHigh.price)}`,
-    `🔸 Prev Swing Lo: ${fmtPrice(primary.prevLow.price)}`,
-    `🔸 BSL:           ${fmtPrice(primary.recentHigh.price)}`,
-    `🔸 SSL:           ${fmtPrice(primary.recentLow.price)}`,
+    `🔸 Most Recent LH: ${fmtPrice(primary.mostRecentLowerHigh?.price || primary.prevHigh.price)}`,
+    `🔸 Most Recent HL: ${fmtPrice(primary.mostRecentHigherLow?.price || primary.prevLow.price)}`,
+    `🔸 BSL:            ${fmtPrice(primary.recentHigh.price)}`,
+    `🔸 SSL:            ${fmtPrice(primary.recentLow.price)}`,
     ...(fvgLine ? [fvgLine] : []),
     ``,
     ...(contraLine ? [`━━━ ⚠ OVERRIDE WARNING ━━━`, contraLine, ``] : []),
     ...(lhLines.length ? [`━━━ ENTRY CONTEXT ━━━`, ...lhLines, ``] : []),
-    `━━━ DERIVATIVES ━━━`,
+    `━━━ CONFLUENCE READ ━━━`,
+    `• MTF Bias: ${trade.mtfBias}  |  HTF: ${htfText}`,
+    ...cleanReasons,
+    ...(patLine ? [patLine] : []),
+    ``,
+    `━━━ DERIVATIVES (Cherry on Top) ━━━`,
     `📈 Funding:   ${fmtPct(row.funding, 4)}`,
     `📊 OI:        ${fmtMoney(row.openInterest)}  ${row.oiChange >= 0 ? '+' : ''}${(row.oiChange * 100).toFixed(2)}%`,
     `👥 L/S Ratio: ${row.longShortRatio ? row.longShortRatio.toFixed(2) : '—'}`,
     `💰 Volume:    ${fmtMoney(row.volume)}`,
-    ``,
-    `━━━ CONFLUENCE ━━━`,
-    `• MTF Bias: ${trade.mtfBias}  |  HTF: ${htfText}`,
-    ...cleanReasons.slice(0, 5), // cap at 5 bullets to keep it readable
-    ...(patLine ? [patLine] : []),
+    `${derivNote}`,
     ``,
     `━━━ INVALIDATION ━━━`,
     `❌ ${trade.invalidation}`,
     ``,
-    `⚠️ Not financial advice. Validate before trading.`,
+    `⚠️ Not financial advice. Structure drives signal. Validate before trading.`,
     `Powered by ATL · AlphaTradersLabs`,
     divider,
   ];
@@ -3461,10 +3351,8 @@ function buildSignalText(row, tf) {
 }
 
 function exportSignal() {
-  // Find the active row — either drawer (market scan) or single coin
   let row = null;
   let tf  = null;
-
   if (state.selected) {
     row = state.rows.find(r => r.symbol === state.selected);
     tf  = row?._scanTf || el.timeframe.value;
@@ -3473,15 +3361,11 @@ function exportSignal() {
     row = state._singleRow;
     tf  = row._scanTf || el.singleTf.value;
   }
-
   if (!row?.analysis) return;
-  if (row.analysis.trade.side === 'WAIT') return; // no export for WAIT
+  if (row.analysis.trade.side === 'WAIT') return;
 
   const text = buildSignalText(row, tf);
-
-  // Copy to clipboard
   navigator.clipboard?.writeText(text).then(() => {
-    // Visual feedback on whichever button is visible
     const btns = [el.drawerExportBtn, el.singleExportBtn].filter(b => b && b.style.display !== 'none');
     btns.forEach(btn => {
       const orig = btn.innerHTML;
@@ -3489,10 +3373,7 @@ function exportSignal() {
       btn.style.background = 'var(--green-b)';
       setTimeout(() => { btn.innerHTML = orig; btn.style.background = ''; }, 2000);
     });
-  }).catch(() => {
-    // Fallback: show text in a prompt so user can copy manually
-    window.prompt('Copy the signal below:', text);
-  });
+  }).catch(() => { window.prompt('Copy the signal below:', text); });
 }
 
 /* ══════════════════════════════════════
@@ -3589,20 +3470,20 @@ async function runSingleScan() {
       const bybitTicker = await safeJson(_EP.by + '/tickers?category=linear&symbol=' + symbol, { result: { list: [] } });
       const item = bybitTicker?.result?.list?.[0];
       if (item) {
-        price    = Number(item.lastPrice || 0);
-        volume   = Number(item.turnover24h || 0);
+        price     = Number(item.lastPrice || 0);
+        volume    = Number(item.turnover24h || 0);
         change24h = Number(item.price24hPcnt || 0);
-        funding  = Number(item.fundingRate || 0);
+        funding   = Number(item.fundingRate || 0);
       }
     } else {
       const [ticker24, premiumData] = await Promise.all([
         safeJson(_EP.bf + '/ticker/24hr?symbol=' + symbol, null),
         safeJson(_EP.bf + '/premiumIndex?symbol=' + symbol, null)
       ]);
-      price    = Number(ticker24?.lastPrice || premiumData?.markPrice || 0);
-      volume   = Number(ticker24?.quoteVolume || 0);
+      price     = Number(ticker24?.lastPrice || premiumData?.markPrice || 0);
+      volume    = Number(ticker24?.quoteVolume || 0);
       change24h = Number(ticker24?.priceChangePercent || 0) / 100;
-      funding  = Number(premiumData?.lastFundingRate || 0);
+      funding   = Number(premiumData?.lastFundingRate || 0);
     }
 
     showSingleProgress('Fetching open interest…');
@@ -3653,10 +3534,15 @@ async function runSingleScan() {
     showSingleProgress('Fetching candles across timeframes…');
     const intervals  = [tf].concat(config.higher);
     const candleSets = await Promise.all(intervals.map(interval => fetchCandles(symbol, interval, config.limit)));
-    const analyses   = candleSets.map((candles, i) => { const an = analyzeStructure(candles, intervals[i]); an.interval = intervals[i]; an.candles = candles; return an; });
+    const analyses   = candleSets.map((candles, i) => {
+      const an = analyzeStructure(candles, intervals[i]);
+      an.interval = intervals[i];
+      an.candles  = candles;
+      if (i === 0) an._candles = candles; // FIX 6
+      return an;
+    });
     const primary    = analyses[0];
     const trade      = deriveTrade(row, primary, analyses.slice(1), tf);
-    // Bugs 3/4/5 fix: replaced checkLevelHistory with checkLevelContext
     const levelHistory = checkLevelContext(candleSets[0], trade);
     row.analysis     = { primary, higher: analyses.slice(1), trade, candles: candleSets[0], levelHistory };
     row.score        = trade.score;
@@ -3672,7 +3558,6 @@ async function runSingleScan() {
     el.singleResultTitle.textContent = symbol + ' · ' + config.label + ' · Score ' + trade.score + '/100';
     hideSingleProgress();
     el.singleResult.classList.add('active');
-    // Show export button only for LONG/SHORT
     el.singleExportBtn.style.display = (trade.side === 'LONG' || trade.side === 'SHORT') ? 'inline-flex' : 'none';
     renderDetail(row, el.singleDetail, tf);
 
@@ -3693,7 +3578,7 @@ function showSingleError(msg)    { el.singleError.textContent = msg; el.singleEr
 function hideSingleError()       { el.singleError.classList.remove('active'); el.singleError.textContent = ''; }
 
 /* ══════════════════════════════════════
-   EMA HELPER
+   EMA HELPERS
 ══════════════════════════════════════ */
 function ema50Series(candles) {
   const k = 2 / (50 + 1);
@@ -3706,9 +3591,6 @@ function ema50Series(candles) {
   return result;
 }
 
-/* ══════════════════════════════════════
-   EMA SCAN ENGINE
-══════════════════════════════════════ */
 async function runEmaScan() {
   if (state.emaBusy) return;
   state.emaBusy = true;
@@ -3735,7 +3617,7 @@ async function runEmaScan() {
       symbols = (Array.isArray(tickers) ? tickers : [])
         .filter(i => i.symbol && !i.symbol.includes('_'))
         .filter(i => quoteFilter === 'ALL' || i.symbol.endsWith(quoteFilter))
-        .filter(i => Number(i.quoteVolume) > 1000000) // FIX T1: was $50M — now $1M so full market really scans all liquid coins
+        .filter(i => Number(i.quoteVolume) > 1000000)
         .sort((a,b) => Number(b.quoteVolume) - Number(a.quoteVolume))
         .map(i => i.symbol);
     } catch(e) {
@@ -3743,7 +3625,7 @@ async function runEmaScan() {
       const bybitTickers = await safeJson(_EP.by + '/tickers?category=linear', { result: { list: [] } });
       symbols = (bybitTickers?.result?.list || [])
         .filter(i => quoteFilter === 'ALL' || normalizeSymbol(i.symbol).endsWith(quoteFilter))
-        .filter(i => Number(i.turnover24h || 0) > 1000000) // FIX T1: was $50M — now $1M
+        .filter(i => Number(i.turnover24h || 0) > 1000000)
         .sort((a,b) => Number(b.turnover24h) - Number(a.turnover24h))
         .map(i => normalizeSymbol(i.symbol));
     }
@@ -3780,10 +3662,10 @@ async function runEmaScan() {
 
           let breakoutIdx = -1;
           for (let j = n - 1; j >= Math.max(1, n - windowDays - 2); j--) {
-            const prevClose  = candles[j-1].close;
-            const prevEma    = ema50[j-1];
-            const currClose  = candles[j].close;
-            const currEma    = ema50[j];
+            const prevClose = candles[j-1].close;
+            const prevEma   = ema50[j-1];
+            const currClose = candles[j].close;
+            const currEma   = ema50[j];
             const crossedAbove = prevClose <= prevEma && currClose > currEma;
             if (crossedAbove) { breakoutIdx = j; break; }
           }
@@ -3805,22 +3687,15 @@ async function runEmaScan() {
 
           const volAvg = sma(candles.slice(breakoutIdx - 20, breakoutIdx).map(c => c.volume), 20);
           const volMult = volAvg > 0 ? candles[breakoutIdx].volume / volAvg : 1;
-
           const pullback = abovePct > 0 && abovePct < 4;
           const dailyAtr = atr(candles.slice(-20));
 
           results.push({
-            symbol: sym,
-            base: baseSymbol(sym),
-            price: last.close,
-            emaVal: emaNow,
-            abovePct,
-            holdDays,
-            breakoutTime,
+            symbol: sym, base: baseSymbol(sym),
+            price: last.close, emaVal: emaNow,
+            abovePct, holdDays, breakoutTime,
             breakoutClose: candles[breakoutIdx].close,
-            volMult,
-            pullback,
-            dailyAtr,
+            volMult, pullback, dailyAtr,
             volume: last.volume * last.close
           });
         } catch(e) { /* skip failed symbol silently */ }
@@ -3831,7 +3706,6 @@ async function runEmaScan() {
     }
 
     results.sort((a, b) => b.breakoutTime - a.breakoutTime || b.holdDays - a.holdDays);
-
     setEmaProgress('Scan complete', results.length, results.length, '', 100);
     renderEmaCards(results, symbols.length);
 
@@ -3868,7 +3742,6 @@ function setEmaProgress(stage, done, total, curSym, forcedPct) {
 function renderEmaCards(results, totalScanned) {
   el.emaCount.textContent = results.length;
   el.emaCount.classList.add('show');
-
   el.emaScanCount.textContent  = totalScanned;
   el.emaFoundCount.textContent = results.length;
   const avgDays = results.length ? (results.reduce((s, r) => s + r.holdDays, 0) / results.length).toFixed(1) : '—';
@@ -3905,22 +3778,10 @@ function renderEmaCards(results, totalScanned) {
         </div>
       </div>
       <div class="ema-card-body">
-        <div class="ema-stat-cell">
-          <span class="ema-stat-lbl">50 EMA</span>
-          <span class="ema-stat-val">${fmtPrice(r.emaVal)}</span>
-        </div>
-        <div class="ema-stat-cell">
-          <span class="ema-stat-lbl">Above EMA</span>
-          <span class="ema-stat-val" style="color:${aboveCol};">+${r.abovePct.toFixed(2)}%</span>
-        </div>
-        <div class="ema-stat-cell">
-          <span class="ema-stat-lbl">Vol on Break</span>
-          <span class="ema-stat-val" style="color:${r.volMult >= 2 ? 'var(--green)' : 'var(--text)'};">${volLabel}</span>
-        </div>
-        <div class="ema-stat-cell">
-          <span class="ema-stat-lbl">Daily ATR</span>
-          <span class="ema-stat-val">${fmtPrice(r.dailyAtr)}</span>
-        </div>
+        <div class="ema-stat-cell"><span class="ema-stat-lbl">50 EMA</span><span class="ema-stat-val">${fmtPrice(r.emaVal)}</span></div>
+        <div class="ema-stat-cell"><span class="ema-stat-lbl">Above EMA</span><span class="ema-stat-val" style="color:${aboveCol};">+${r.abovePct.toFixed(2)}%</span></div>
+        <div class="ema-stat-cell"><span class="ema-stat-lbl">Vol on Break</span><span class="ema-stat-val" style="color:${r.volMult >= 2 ? 'var(--green)' : 'var(--text)'};">${volLabel}</span></div>
+        <div class="ema-stat-cell"><span class="ema-stat-lbl">Daily ATR</span><span class="ema-stat-val">${fmtPrice(r.dailyAtr)}</span></div>
       </div>
       <div class="ema-card-foot">
         <span class="ema-breakout-date">Crossed: ${dateStr}</span>
