@@ -2399,10 +2399,13 @@ function analyzeStructure(candles, tf) {
   const pivots = findPivots(candles);
   const lastHighs = pivots.highs.slice(-5);
   const lastLows  = pivots.lows.slice(-5);
-  const recentHigh = lastHighs[lastHighs.length - 1] || { price: Math.max(...candles.slice(-30).map(c => c.high)), index: candles.length - 1 };
-  const recentLow  = lastLows[lastLows.length - 1]   || { price: Math.min(...candles.slice(-30).map(c => c.low)),  index: candles.length - 1 };
-  const prevHigh = lastHighs[lastHighs.length - 2] || recentHigh;
-  const prevLow  = lastLows[lastLows.length - 2]   || recentLow;
+  let recentHigh = lastHighs[lastHighs.length - 1] || { price: Math.max(...candles.slice(-30).map(c => c.high)), index: candles.length - 1 };
+  let recentLow  = lastLows[lastLows.length - 1]   || { price: Math.min(...candles.slice(-30).map(c => c.low)),  index: candles.length - 1 };
+  // BUG 1 FIX: swap if inverted — a swing low can never be numerically above a swing high
+  if (recentHigh.price < recentLow.price) { [recentHigh, recentLow] = [recentLow, recentHigh]; }
+  let prevHigh = lastHighs[lastHighs.length - 2] || recentHigh;
+  let prevLow  = lastLows[lastLows.length - 2]   || recentLow;
+  if (prevHigh.price < prevLow.price) { [prevHigh, prevLow] = [prevLow, prevHigh]; }
   const emaFast  = ema(closes, 21);
   const emaSlow  = ema(closes, 55);
   const slope    = emaFast - emaSlow;
@@ -2673,90 +2676,89 @@ function deriveTrade(row, primary, higherAnalyses, tf) {
       ? 'Invalidates on acceptance above buy-side liquidity and stop zone.'
       : 'No active setup — wait for MSS, CHoCH, or sweep with displacement.';
 
+  // BUG 2 FIX: surface contra-derivatives warning when SMC overrides derivatives
+  const contraDerivatives = smcOverride
+    && derivativesRule.actionSide !== 'WAIT'
+    && derivativesRule.actionSide !== side;
+  if (contraDerivatives) {
+    reasons.unshift(
+      '⚠ CONTRA-DERIVATIVES: SMC structure override active — derivatives engine signalled '
+      + derivativesRule.actionSide + ' (' + derivativesRule.scenario + ': ' + derivativesRule.interpretation
+      + '). Structure confluence overrode it. Reduce size and require strong confirmation before entry.'
+    );
+  }
+
   return { side, entry, stop, tp1, tp2, tp3, rr, score, mtfBias, derivativesRule,
-    reasons, invalidation, smcOverride };
+    reasons, invalidation, smcOverride, contraDerivatives };
 }
 
 /* ══════════════════════════════════════
-   LEVEL HISTORY VALIDATOR  (FIX T4)
-   Checks if entry/stop/TP1 levels were already traded through
-   in recent candles. Returns status for each level.
-   status: 'clean' | 'swept' | 'already_hit' | 'n/a'
+   LEVEL CONTEXT VALIDATOR  (Bugs 3/4/5 fix)
+   Replaces the old checkLevelHistory() which scanned backwards
+   through price history and produced false positives (stop
+   "swept" just because price rose through it, entry "visited"
+   just because price had to travel through it to get here).
+
+   This function is FORWARD-LOOKING only — it checks current
+   price position relative to the freshly-calculated levels.
+   No historical candle scanning. No false sweeps.
+
+   Returns:
+     entry: 'live' | 'approaching' | 'entry_missed' | 'clean' | 'n/a'
+     entryMissedPct: number (% price has moved past entry) | null
+     stop:  'n/a' (no longer assessed — stop is always valid if set)
+     tp1/tp2: 'n/a'
 ══════════════════════════════════════ */
-function checkLevelHistory(candles, trade) {
-  if (!candles || candles.length < 5 || trade.side === 'WAIT') {
-    return { entry: 'n/a', stop: 'n/a', tp1: 'n/a', tp2: 'n/a', stopSweepBarsAgo: null, tp1HitBarsAgo: null };
-  }
-  const side  = trade.side;
-  const lookback = candles.slice(-50); // look back up to 50 bars
-  const n     = lookback.length;
+function checkLevelContext(candles, trade) {
+  const empty = { entry: 'n/a', stop: 'n/a', tp1: 'n/a', tp2: 'n/a',
+                  stopSweepBarsAgo: null, tp1HitBarsAgo: null, entryMissedPct: null };
+  if (!candles || candles.length < 2 || trade.side === 'WAIT') return empty;
+  if (!Number.isFinite(trade.entry)) return empty;
 
-  function findLevelTouch(level, checkHigh, lookbackCandles) {
-    // Scan from most-recent backward; skip the last candle (that's current price)
-    for (let i = lookbackCandles.length - 2; i >= 0; i--) {
-      const c = lookbackCandles[i];
-      if (checkHigh ? c.high >= level : c.low <= level) {
-        return lookbackCandles.length - 1 - i; // bars ago
-      }
-    }
-    return null;
-  }
+  const currentPrice = candles[candles.length - 1].close;
+  const entry = trade.entry;
+  const atrVal = trade._atr || Math.abs(entry - trade.stop) || entry * 0.005;
+  const approachThreshold = atrVal * 0.5; // within 0.5 ATR = approaching
+  const missedBuffer = 0.005; // 0.5% past entry = missed
 
-  const result = { entry: 'clean', stop: 'clean', tp1: 'clean', tp2: 'clean', stopSweepBarsAgo: null, tp1HitBarsAgo: null };
+  let entryStatus = 'clean';
+  let entryMissedPct = null;
 
-  if (side === 'LONG') {
-    // For LONG: stop is below — was it swept (price dipped to/below stop)?
-    if (Number.isFinite(trade.stop)) {
-      const barsAgo = findLevelTouch(trade.stop, false, lookback);
-      if (barsAgo !== null) {
-        result.stop = barsAgo <= 3 ? 'recently_swept' : 'swept';
-        result.stopSweepBarsAgo = barsAgo;
+  if (trade.side === 'LONG') {
+    // For LONG: entry is below current price (we want price to come DOWN to it)
+    if (currentPrice <= entry * (1 + missedBuffer)) {
+      // Price is at or below entry → setup is live or already passed through
+      if (currentPrice <= entry) {
+        entryStatus = 'live'; // price is at/below entry zone — ideal, looking for bounce
+      } else {
+        entryStatus = 'approaching'; // within 0.5% above entry
       }
+    } else if (currentPrice <= entry + approachThreshold) {
+      entryStatus = 'approaching'; // within 0.5 ATR above entry
+    } else if (currentPrice > entry * (1 + missedBuffer)) {
+      // Price is well above entry — entry zone is behind price, setup missed
+      entryStatus = 'entry_missed';
+      entryMissedPct = ((currentPrice - entry) / entry) * 100;
     }
-    // Was TP1 already reached (price hit above tp1)?
-    if (Number.isFinite(trade.tp1)) {
-      const barsAgo = findLevelTouch(trade.tp1, true, lookback);
-      if (barsAgo !== null) {
-        result.tp1 = 'already_hit';
-        result.tp1HitBarsAgo = barsAgo;
+  } else if (trade.side === 'SHORT') {
+    // For SHORT: entry is above current price (we want price to come UP to it)
+    if (currentPrice >= entry * (1 - missedBuffer)) {
+      if (currentPrice >= entry) {
+        entryStatus = 'live'; // price is at/above entry zone
+      } else {
+        entryStatus = 'approaching';
       }
-    }
-    if (Number.isFinite(trade.tp2)) {
-      const barsAgo = findLevelTouch(trade.tp2, true, lookback);
-      if (barsAgo !== null) result.tp2 = 'already_hit';
-    }
-    // Entry zone — was it already traded through (price below entry)?
-    if (Number.isFinite(trade.entry)) {
-      const barsAgo = findLevelTouch(trade.entry, false, lookback);
-      if (barsAgo !== null) result.entry = 'previously_visited';
-    }
-  } else if (side === 'SHORT') {
-    // For SHORT: stop is above — was it swept?
-    if (Number.isFinite(trade.stop)) {
-      const barsAgo = findLevelTouch(trade.stop, true, lookback);
-      if (barsAgo !== null) {
-        result.stop = barsAgo <= 3 ? 'recently_swept' : 'swept';
-        result.stopSweepBarsAgo = barsAgo;
-      }
-    }
-    // Was TP1 already reached (price went below tp1)?
-    if (Number.isFinite(trade.tp1)) {
-      const barsAgo = findLevelTouch(trade.tp1, false, lookback);
-      if (barsAgo !== null) {
-        result.tp1 = 'already_hit';
-        result.tp1HitBarsAgo = barsAgo;
-      }
-    }
-    if (Number.isFinite(trade.tp2)) {
-      const barsAgo = findLevelTouch(trade.tp2, false, lookback);
-      if (barsAgo !== null) result.tp2 = 'already_hit';
-    }
-    if (Number.isFinite(trade.entry)) {
-      const barsAgo = findLevelTouch(trade.entry, true, lookback);
-      if (barsAgo !== null) result.entry = 'previously_visited';
+    } else if (currentPrice >= entry - approachThreshold) {
+      entryStatus = 'approaching';
+    } else if (currentPrice < entry * (1 - missedBuffer)) {
+      // Price is well below entry — entry zone is behind price, setup missed
+      entryStatus = 'entry_missed';
+      entryMissedPct = ((entry - currentPrice) / entry) * 100;
     }
   }
-  return result;
+
+  return { entry: entryStatus, stop: 'n/a', tp1: 'n/a', tp2: 'n/a',
+           stopSweepBarsAgo: null, tp1HitBarsAgo: null, entryMissedPct };
 }
 
 /* ══════════════════════════════════════
@@ -2769,8 +2771,8 @@ async function analyzeRow(row, tf) {
   const analyses   = candleSets.map((candles, i) => { const an = analyzeStructure(candles, intervals[i]); an.interval = intervals[i]; an.candles = candles; return an; });
   const primary    = analyses[0];
   const trade      = deriveTrade(row, primary, analyses.slice(1), tf);
-  // FIX T4: validate if entry/stop/TP levels were already hit in recent bars
-  const levelHistory = checkLevelHistory(candleSets[0], trade);
+  // Bugs 3/4/5 fix: replaced checkLevelHistory with checkLevelContext (forward-looking only)
+  const levelHistory = checkLevelContext(candleSets[0], trade);
   row.analysis       = { primary, higher: analyses.slice(1), trade, candles: candleSets[0], levelHistory };
   row.score          = trade.score;
   row.side           = trade.side;
@@ -2980,15 +2982,15 @@ function renderDetail(row, targetEl, tf) {
   const lh = levelHistory || {};
 
   /* ─── FIX 1: levelCell declared at top of function ─── */
-  // FIX T4: levelHistoryBadge helper
+  // Entry context badge for levelCell labels
   const lhBadge = (status) => {
     if (!status || status === 'clean' || status === 'n/a') return '';
-    if (status === 'swept' || status === 'recently_swept')
-      return `<span style="font-size:8px;color:var(--gold);font-weight:700;letter-spacing:0.06em;"> ✓SWEPT</span>`;
-    if (status === 'already_hit')
-      return `<span style="font-size:8px;color:var(--red);font-weight:700;letter-spacing:0.06em;"> ⚠HIT</span>`;
-    if (status === 'previously_visited')
-      return `<span style="font-size:8px;color:var(--cyan);font-weight:700;letter-spacing:0.06em;"> ↩VISITED</span>`;
+    if (status === 'entry_missed')
+      return `<span style="font-size:8px;color:var(--red);font-weight:700;letter-spacing:0.06em;"> 🚫MISSED</span>`;
+    if (status === 'live')
+      return `<span style="font-size:8px;color:var(--green);font-weight:700;letter-spacing:0.06em;"> ◎LIVE</span>`;
+    if (status === 'approaching')
+      return `<span style="font-size:8px;color:var(--gold);font-weight:700;letter-spacing:0.06em;"> →APPROACHING</span>`;
     return '';
   };
 
@@ -3133,25 +3135,32 @@ function renderDetail(row, targetEl, tf) {
 
   } else {
     // Normal LONG / SHORT ticket
-    // FIX T4: build level history warning banner
+    // BUG 2 FIX: contra-derivatives warning banner
+    const contraBannerHtml = trade.contraDerivatives ? `
+      <div style="padding:10px 13px; border-bottom:1px solid rgba(255,140,0,0.3); background:rgba(255,140,0,0.07);">
+        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:#ff8c00;margin-bottom:6px;">⚠ CONTRA-DERIVATIVES TRADE</div>
+        <div style="font-size:11px;color:var(--sub);line-height:1.65;">
+          MSS/CHoCH structure override is active. Derivatives engine signalled
+          <b style="color:#ff8c00;">${trade.derivativesRule.actionSide}</b>
+          (${trade.derivativesRule.scenario} · ${trade.derivativesRule.interpretation}).
+          Structure confluence overrode it.<br>
+          <span style="color:#ff8c00;font-weight:600;">→ Reduce position size. Require strong confirmation candle before entry.</span>
+        </div>
+      </div>` : '';
+
+    // BUG 3/4/5 FIX: level context (forward-looking only — no history audit)
     const lhWarnings = [];
-    if (lh.stop === 'swept' || lh.stop === 'recently_swept') {
-      const ago = lh.stopSweepBarsAgo;
-      lhWarnings.push(`<li style="color:var(--green);"><b>✓ Stop zone was swept ${ago ? ago + ' bar(s) ago' : 'recently'}</b> — liquidity at that level is cleared. This <em>strengthens</em> the setup (smart money already hunted stops there).</li>`);
-    }
-    if (lh.tp1 === 'already_hit') {
-      const ago = lh.tp1HitBarsAgo;
-      lhWarnings.push(`<li style="color:var(--gold);"><b>⚠ TP1 zone (${fmtLevel(trade.tp1)}) was already reached ${ago ? ago + ' bar(s) ago' : 'recently'}</b> — first target is less reliable. Consider using TP2 as primary target or wait for retest.</li>`);
-    }
-    if (lh.tp2 === 'already_hit') {
-      lhWarnings.push(`<li style="color:var(--red);"><b>⚠ TP2 already hit</b> — setup may be extended. Reassess risk/reward before entry.</li>`);
-    }
-    if (lh.entry === 'previously_visited') {
-      lhWarnings.push(`<li style="color:var(--cyan);"><b>↩ Entry zone was previously visited</b> — price has been through this zone before. Watch for accumulation/distribution pattern.</li>`);
+    if (lh.entry === 'entry_missed') {
+      const pctAway = lh.entryMissedPct ? Math.abs(lh.entryMissedPct).toFixed(2) : '?';
+      lhWarnings.push(`<li style="color:var(--red);"><b>🚫 Entry zone already passed</b> — price has moved ${pctAway}% beyond entry zone. Consider waiting for a pullback to re-test the zone, or skip this setup.</li>`);
+    } else if (lh.entry === 'approaching') {
+      lhWarnings.push(`<li style="color:var(--green);"><b>✅ Entry zone approaching</b> — price is within reach of the entry zone. Monitor for trigger confirmation.</li>`);
+    } else if (lh.entry === 'live') {
+      lhWarnings.push(`<li style="color:var(--cyan);"><b>◎ Setup is live</b> — price is at or inside the entry zone now.</li>`);
     }
     const lhBannerHtml = lhWarnings.length ? `
       <div style="padding:10px 13px; border-bottom:1px solid var(--border); background:rgba(0,0,0,0.2);">
-        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--sub);margin-bottom:7px;">◈ Level History Audit</div>
+        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--sub);margin-bottom:7px;">◈ Entry Context</div>
         <ul style="list-style:none;font-size:11px;line-height:1.8;padding:0;">${lhWarnings.join('')}</ul>
       </div>` : '';
 
@@ -3164,6 +3173,7 @@ function renderDetail(row, targetEl, tf) {
         </div>
         <span class="badge ${sideClass}">${dirWord.toUpperCase()}</span>
       </div>
+      ${contraBannerHtml}
       <div class="levels-grid" style="gap:1px; background:var(--border);">
         ${levelCell('Entry Zone', trade.entry, '', lh.entry)}
         ${levelCell('Stop Loss',  trade.stop,  'down', lh.stop)}
@@ -3364,20 +3374,21 @@ function buildSignalText(row, tf) {
         ? `🔸 ${primary.bos.label} Level:  ${fmtPrice(primary.bos.level)}`
         : '';
 
-  // Level history lines
+  // Entry context lines (forward-looking only)
   const lhLines = [];
-  if (lh.stop === 'swept' || lh.stop === 'recently_swept') {
-    lhLines.push(`✅ Stop zone swept ${lh.stopSweepBarsAgo ? lh.stopSweepBarsAgo + ' bar(s) ago' : 'recently'} — liquidity cleared`);
+  if (lh.entry === 'entry_missed') {
+    const pct = lh.entryMissedPct ? Math.abs(lh.entryMissedPct).toFixed(2) : '?';
+    lhLines.push(`🚫 Entry zone already passed — price moved ${pct}% beyond entry. Wait for pullback or skip.`);
+  } else if (lh.entry === 'live') {
+    lhLines.push(`✅ Setup LIVE — price is at/inside the entry zone now.`);
+  } else if (lh.entry === 'approaching') {
+    lhLines.push(`→ Entry zone approaching — monitor for trigger confirmation.`);
   }
-  if (lh.tp1 === 'already_hit') {
-    lhLines.push(`⚠️ TP1 already reached ${lh.tp1HitBarsAgo ? lh.tp1HitBarsAgo + ' bar(s) ago' : 'recently'} — consider TP2 as primary target`);
-  }
-  if (lh.tp2 === 'already_hit') {
-    lhLines.push(`⚠️ TP2 already hit — reassess risk/reward before entry`);
-  }
-  if (lh.entry === 'previously_visited') {
-    lhLines.push(`↩ Entry zone previously visited — watch for retest confirmation`);
-  }
+
+  // Contra-derivatives warning for signal export
+  const contraLine = trade.contraDerivatives
+    ? `⚠ CONTRA-DERIVATIVES: Derivatives signalled ${trade.derivativesRule.actionSide} (${trade.derivativesRule.scenario}). Structure override active. Reduce size.`
+    : '';
 
   // Confluence bullets — clean up HTML tags
   const cleanReasons = trade.reasons
@@ -3425,7 +3436,8 @@ function buildSignalText(row, tf) {
     `🔸 SSL:           ${fmtPrice(primary.recentLow.price)}`,
     ...(fvgLine ? [fvgLine] : []),
     ``,
-    ...(lhLines.length ? [`━━━ LEVEL HISTORY ━━━`, ...lhLines, ``] : []),
+    ...(contraLine ? [`━━━ ⚠ OVERRIDE WARNING ━━━`, contraLine, ``] : []),
+    ...(lhLines.length ? [`━━━ ENTRY CONTEXT ━━━`, ...lhLines, ``] : []),
     `━━━ DERIVATIVES ━━━`,
     `📈 Funding:   ${fmtPct(row.funding, 4)}`,
     `📊 OI:        ${fmtMoney(row.openInterest)}  ${row.oiChange >= 0 ? '+' : ''}${(row.oiChange * 100).toFixed(2)}%`,
@@ -3644,8 +3656,8 @@ async function runSingleScan() {
     const analyses   = candleSets.map((candles, i) => { const an = analyzeStructure(candles, intervals[i]); an.interval = intervals[i]; an.candles = candles; return an; });
     const primary    = analyses[0];
     const trade      = deriveTrade(row, primary, analyses.slice(1), tf);
-    // FIX T4: level history validation for single coin
-    const levelHistory = checkLevelHistory(candleSets[0], trade);
+    // Bugs 3/4/5 fix: replaced checkLevelHistory with checkLevelContext
+    const levelHistory = checkLevelContext(candleSets[0], trade);
     row.analysis     = { primary, higher: analyses.slice(1), trade, candles: candleSets[0], levelHistory };
     row.score        = trade.score;
     row.side         = trade.side;
