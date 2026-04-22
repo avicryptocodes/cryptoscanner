@@ -2136,8 +2136,146 @@ function detectFvg(candles, tf) {
   return null;
 }
 
+/* ══════════════════════════════════════
+   CANDLESTICK PATTERN DETECTION  (FIX T3)
+   Returns array of { name, direction:'Bullish'|'Bearish', strength:1-3 }
+   Checks last 3 candles. strength: 1=weak, 2=medium, 3=strong
+══════════════════════════════════════ */
+function detectCandlePatterns(candles) {
+  if (!candles || candles.length < 3) return [];
+  const patterns = [];
+  const n  = candles.length;
+  const c0 = candles[n - 1]; // current / most recent
+  const c1 = candles[n - 2]; // previous
+  const c2 = candles[n - 3]; // two bars ago
+
+  const body0  = Math.abs(c0.close - c0.open);
+  const body1  = Math.abs(c1.close - c1.open);
+  const body2  = Math.abs(c2.close - c2.open);
+  const range0 = c0.high - c0.low || Number.EPSILON;
+  const range1 = c1.high - c1.low || Number.EPSILON;
+  const upperShadow0 = c0.high - Math.max(c0.open, c0.close);
+  const lowerShadow0 = Math.min(c0.open, c0.close) - c0.low;
+  const upperShadow1 = c1.high - Math.max(c1.open, c1.close);
+  const lowerShadow1 = Math.min(c1.open, c1.close) - c1.low;
+  const bull0 = c0.close > c0.open;
+  const bull1 = c1.close > c1.open;
+  const bull2 = c2.close > c2.open;
+
+  // — Doji (indecision) —
+  if (body0 / range0 < 0.12 && range0 > 0) {
+    patterns.push({ name: 'Doji', direction: 'Neutral', strength: 1 });
+  }
+
+  // — Hammer (bullish reversal) — small body top, long lower shadow, at bottom —
+  if (!bull1 && lowerShadow0 >= body0 * 2.2 && upperShadow0 < body0 * 0.5 && body0 / range0 > 0.1) {
+    patterns.push({ name: 'Hammer', direction: 'Bullish', strength: 2 });
+  }
+
+  // — Inverted Hammer (bullish after down move) —
+  if (!bull1 && upperShadow0 >= body0 * 2.2 && lowerShadow0 < body0 * 0.5 && body0 / range0 > 0.1) {
+    patterns.push({ name: 'Inverted Hammer', direction: 'Bullish', strength: 1 });
+  }
+
+  // — Shooting Star (bearish reversal) — small body bottom, long upper shadow, at top —
+  if (bull1 && upperShadow0 >= body0 * 2.2 && lowerShadow0 < body0 * 0.5 && body0 / range0 > 0.1) {
+    patterns.push({ name: 'Shooting Star', direction: 'Bearish', strength: 2 });
+  }
+
+  // — Hanging Man (bearish after up move) —
+  if (bull1 && lowerShadow0 >= body0 * 2.2 && upperShadow0 < body0 * 0.5 && body0 / range0 > 0.1) {
+    patterns.push({ name: 'Hanging Man', direction: 'Bearish', strength: 1 });
+  }
+
+  // — Bullish Engulfing —
+  if (!bull1 && bull0 && c0.open < c1.close && c0.close > c1.open && body0 > body1 * 1.05) {
+    patterns.push({ name: 'Bullish Engulfing', direction: 'Bullish', strength: 3 });
+  }
+
+  // — Bearish Engulfing —
+  if (bull1 && !bull0 && c0.open > c1.close && c0.close < c1.open && body0 > body1 * 1.05) {
+    patterns.push({ name: 'Bearish Engulfing', direction: 'Bearish', strength: 3 });
+  }
+
+  // — Bullish Pinbar (long lower wick, rejection from low) —
+  if (lowerShadow0 > range0 * 0.55 && body0 < range0 * 0.35 && upperShadow0 < range0 * 0.25) {
+    patterns.push({ name: 'Bullish Pinbar', direction: 'Bullish', strength: 2 });
+  }
+
+  // — Bearish Pinbar (long upper wick, rejection from high) —
+  if (upperShadow0 > range0 * 0.55 && body0 < range0 * 0.35 && lowerShadow0 < range0 * 0.25) {
+    patterns.push({ name: 'Bearish Pinbar', direction: 'Bearish', strength: 2 });
+  }
+
+  // — Bullish Marubozu (strong bullish body, no shadows) —
+  if (bull0 && body0 / range0 > 0.88) {
+    patterns.push({ name: 'Bullish Marubozu', direction: 'Bullish', strength: 2 });
+  }
+
+  // — Bearish Marubozu (strong bearish body, no shadows) —
+  if (!bull0 && body0 / range0 > 0.88) {
+    patterns.push({ name: 'Bearish Marubozu', direction: 'Bearish', strength: 2 });
+  }
+
+  // — Bullish Harami (small bull inside prior large bear) —
+  if (!bull1 && bull0 && c0.open > c1.close && c0.close < c1.open && body0 < body1 * 0.55) {
+    patterns.push({ name: 'Bullish Harami', direction: 'Bullish', strength: 1 });
+  }
+
+  // — Bearish Harami (small bear inside prior large bull) —
+  if (bull1 && !bull0 && c0.open < c1.close && c0.close > c1.open && body0 < body1 * 0.55) {
+    patterns.push({ name: 'Bearish Harami', direction: 'Bearish', strength: 1 });
+  }
+
+  // — Morning Star (3-bar: bear, doji/small, bull) —
+  if (!bull2 && body1 / (c1.high - c1.low || 1) < 0.35 && bull0 && c0.close > (c2.open + c2.close) / 2) {
+    patterns.push({ name: 'Morning Star', direction: 'Bullish', strength: 3 });
+  }
+
+  // — Evening Star (3-bar: bull, doji/small, bear) —
+  if (bull2 && body1 / (c1.high - c1.low || 1) < 0.35 && !bull0 && c0.close < (c2.open + c2.close) / 2) {
+    patterns.push({ name: 'Evening Star', direction: 'Bearish', strength: 3 });
+  }
+
+  // — Three White Soldiers (3 consecutive bullish bodies each closing higher) —
+  if (bull0 && bull1 && bull2 &&
+      c0.close > c1.close && c1.close > c2.close &&
+      c0.open > c1.open  && c1.open  > c2.open  &&
+      body0 > 0 && body1 > 0 && body2 > 0) {
+    patterns.push({ name: 'Three White Soldiers', direction: 'Bullish', strength: 3 });
+  }
+
+  // — Three Black Crows (3 consecutive bearish bodies each closing lower) —
+  if (!bull0 && !bull1 && !bull2 &&
+      c0.close < c1.close && c1.close < c2.close &&
+      c0.open  < c1.open  && c1.open  < c2.open  &&
+      body0 > 0 && body1 > 0 && body2 > 0) {
+    patterns.push({ name: 'Three Black Crows', direction: 'Bearish', strength: 3 });
+  }
+
+  // — Tweezer Bottom (two candles with same low: bull reversal signal) —
+  if (!bull1 && bull0 && Math.abs(c0.low - c1.low) / (range0 || 1) < 0.05) {
+    patterns.push({ name: 'Tweezer Bottom', direction: 'Bullish', strength: 2 });
+  }
+
+  // — Tweezer Top (two candles with same high: bear reversal signal) —
+  if (bull1 && !bull0 && Math.abs(c0.high - c1.high) / (range0 || 1) < 0.05) {
+    patterns.push({ name: 'Tweezer Top', direction: 'Bearish', strength: 2 });
+  }
+
+  // Remove duplicates by name, keep highest strength
+  const seen = new Map();
+  for (const p of patterns) {
+    const ex = seen.get(p.name);
+    if (!ex || p.strength > ex.strength) seen.set(p.name, p);
+  }
+  return [...seen.values()];
+}
+
 function analyzeStructure(candles, tf) {
-  if (!candles || candles.length < 60) return {
+  // FIX T5: weekly candles are limited — allow as few as 20 bars for 1w analysis
+  const minBars = tf === '1w' ? 20 : 60;
+  if (!candles || candles.length < minBars) return {
     last: candles?.[candles.length-1] || { close:0, open:0, high:0, low:0, volume:0 },
     atr: 0, pivots: { highs:[], lows:[] },
     recentHigh: { price:0, index:0 }, recentLow: { price:0, index:0 },
@@ -2148,6 +2286,7 @@ function analyzeStructure(candles, tf) {
     volumeExpansion: 1, trend: 'Insufficient data',
     trendStrength: 0, structureEvent: 'Insufficient history', fvg: null,
     bos: null, choch: null, mss: null, smcEvent: null,
+    candlePatterns: [],
     _insufficient: true
   };
 
@@ -2252,6 +2391,7 @@ function analyzeStructure(candles, tf) {
     bias, brokeHigh, brokeLow, sweepLow, sweepHigh, displacement, volumeExpansion,
     trend, trendStrength, structureEvent, fvg,
     bos, choch, mss, smcEvent,
+    candlePatterns: detectCandlePatterns(candles),
     higherHighs, higherLows, lowerHighs, lowerLows };
 }
 
@@ -2374,6 +2514,17 @@ function deriveTrade(row, primary, higherAnalyses, tf) {
   if ((side === 'SHORT' && crowdLong) || (side === 'LONG' && crowdShort)) score += 6;
   if (smcOverride && side !== 'WAIT') score += 5;
   if (derivativesRule.skip) score = 0;
+
+  // FIX T3: candlestick pattern confluence scoring
+  const patterns = primary.candlePatterns || [];
+  const alignedPatterns = patterns.filter(p =>
+    p.direction === 'Neutral' ||
+    (side === 'LONG'  && p.direction === 'Bullish') ||
+    (side === 'SHORT' && p.direction === 'Bearish')
+  );
+  const patternScore = alignedPatterns.reduce((s, p) => s + p.strength, 0);
+  score += Math.min(patternScore * 3, 12); // cap pattern bonus at +12
+
   score = clamp(Math.round(score), 0, 95);
 
   const reasons = [
@@ -2403,6 +2554,17 @@ function deriveTrade(row, primary, higherAnalyses, tf) {
   if (crowdLong)  reasons.push('Long-heavy crowd; watch for long liquidation traps');
   if (crowdShort) reasons.push('Short-heavy crowd; watch for short squeeze reversals');
 
+  // FIX T3: candlestick pattern reasons
+  const patterns = primary.candlePatterns || [];
+  if (patterns.length > 0) {
+    const bullPats  = patterns.filter(p => p.direction === 'Bullish').map(p => p.name);
+    const bearPats  = patterns.filter(p => p.direction === 'Bearish').map(p => p.name);
+    const neutPats  = patterns.filter(p => p.direction === 'Neutral').map(p => p.name);
+    if (bullPats.length)  reasons.push('Bullish candle pattern(s): ' + bullPats.join(', '));
+    if (bearPats.length)  reasons.push('Bearish candle pattern(s): ' + bearPats.join(', '));
+    if (neutPats.length)  reasons.push('Indecision pattern(s): ' + neutPats.join(', '));
+  }
+
   const invalidation = side === 'LONG'
     ? 'Invalidates on acceptance below sell-side liquidity and stop zone.'
     : side === 'SHORT'
@@ -2411,6 +2573,88 @@ function deriveTrade(row, primary, higherAnalyses, tf) {
 
   return { side, entry, stop, tp1, tp2, tp3, rr, score, mtfBias, derivativesRule,
     reasons, invalidation, smcOverride };
+}
+
+/* ══════════════════════════════════════
+   LEVEL HISTORY VALIDATOR  (FIX T4)
+   Checks if entry/stop/TP1 levels were already traded through
+   in recent candles. Returns status for each level.
+   status: 'clean' | 'swept' | 'already_hit' | 'n/a'
+══════════════════════════════════════ */
+function checkLevelHistory(candles, trade) {
+  if (!candles || candles.length < 5 || trade.side === 'WAIT') {
+    return { entry: 'n/a', stop: 'n/a', tp1: 'n/a', tp2: 'n/a', stopSweepBarsAgo: null, tp1HitBarsAgo: null };
+  }
+  const side  = trade.side;
+  const lookback = candles.slice(-50); // look back up to 50 bars
+  const n     = lookback.length;
+
+  function findLevelTouch(level, checkHigh, lookbackCandles) {
+    // Scan from most-recent backward; skip the last candle (that's current price)
+    for (let i = lookbackCandles.length - 2; i >= 0; i--) {
+      const c = lookbackCandles[i];
+      if (checkHigh ? c.high >= level : c.low <= level) {
+        return lookbackCandles.length - 1 - i; // bars ago
+      }
+    }
+    return null;
+  }
+
+  const result = { entry: 'clean', stop: 'clean', tp1: 'clean', tp2: 'clean', stopSweepBarsAgo: null, tp1HitBarsAgo: null };
+
+  if (side === 'LONG') {
+    // For LONG: stop is below — was it swept (price dipped to/below stop)?
+    if (Number.isFinite(trade.stop)) {
+      const barsAgo = findLevelTouch(trade.stop, false, lookback);
+      if (barsAgo !== null) {
+        result.stop = barsAgo <= 3 ? 'recently_swept' : 'swept';
+        result.stopSweepBarsAgo = barsAgo;
+      }
+    }
+    // Was TP1 already reached (price hit above tp1)?
+    if (Number.isFinite(trade.tp1)) {
+      const barsAgo = findLevelTouch(trade.tp1, true, lookback);
+      if (barsAgo !== null) {
+        result.tp1 = 'already_hit';
+        result.tp1HitBarsAgo = barsAgo;
+      }
+    }
+    if (Number.isFinite(trade.tp2)) {
+      const barsAgo = findLevelTouch(trade.tp2, true, lookback);
+      if (barsAgo !== null) result.tp2 = 'already_hit';
+    }
+    // Entry zone — was it already traded through (price below entry)?
+    if (Number.isFinite(trade.entry)) {
+      const barsAgo = findLevelTouch(trade.entry, false, lookback);
+      if (barsAgo !== null) result.entry = 'previously_visited';
+    }
+  } else if (side === 'SHORT') {
+    // For SHORT: stop is above — was it swept?
+    if (Number.isFinite(trade.stop)) {
+      const barsAgo = findLevelTouch(trade.stop, true, lookback);
+      if (barsAgo !== null) {
+        result.stop = barsAgo <= 3 ? 'recently_swept' : 'swept';
+        result.stopSweepBarsAgo = barsAgo;
+      }
+    }
+    // Was TP1 already reached (price went below tp1)?
+    if (Number.isFinite(trade.tp1)) {
+      const barsAgo = findLevelTouch(trade.tp1, false, lookback);
+      if (barsAgo !== null) {
+        result.tp1 = 'already_hit';
+        result.tp1HitBarsAgo = barsAgo;
+      }
+    }
+    if (Number.isFinite(trade.tp2)) {
+      const barsAgo = findLevelTouch(trade.tp2, false, lookback);
+      if (barsAgo !== null) result.tp2 = 'already_hit';
+    }
+    if (Number.isFinite(trade.entry)) {
+      const barsAgo = findLevelTouch(trade.entry, true, lookback);
+      if (barsAgo !== null) result.entry = 'previously_visited';
+    }
+  }
+  return result;
 }
 
 /* ══════════════════════════════════════
@@ -2423,7 +2667,9 @@ async function analyzeRow(row, tf) {
   const analyses   = candleSets.map((candles, i) => { const an = analyzeStructure(candles, intervals[i]); an.interval = intervals[i]; an.candles = candles; return an; });
   const primary    = analyses[0];
   const trade      = deriveTrade(row, primary, analyses.slice(1), tf);
-  row.analysis       = { primary, higher: analyses.slice(1), trade, candles: candleSets[0] };
+  // FIX T4: validate if entry/stop/TP levels were already hit in recent bars
+  const levelHistory = checkLevelHistory(candleSets[0], trade);
+  row.analysis       = { primary, higher: analyses.slice(1), trade, candles: candleSets[0], levelHistory };
   row.score          = trade.score;
   row.side           = trade.side;
   row.bias           = primary.bias;
@@ -2627,15 +2873,28 @@ function selectRow(symbol) {
    as a bare variable (undefined). Corrected to `primary.bias`.
 ══════════════════════════════════════ */
 function renderDetail(row, targetEl, tf) {
-  const { primary, higher, trade, candles } = row.analysis;
+  const { primary, higher, trade, candles, levelHistory } = row.analysis;
   const resolvedTf = tf || row._scanTf || el.timeframe.value;
+  const lh = levelHistory || {};
 
   /* ─── FIX 1: levelCell declared at top of function ─── */
-  const levelCell = (label, val, colorClass = '') => {
+  // FIX T4: levelHistoryBadge helper
+  const lhBadge = (status) => {
+    if (!status || status === 'clean' || status === 'n/a') return '';
+    if (status === 'swept' || status === 'recently_swept')
+      return `<span style="font-size:8px;color:var(--gold);font-weight:700;letter-spacing:0.06em;"> ✓SWEPT</span>`;
+    if (status === 'already_hit')
+      return `<span style="font-size:8px;color:var(--red);font-weight:700;letter-spacing:0.06em;"> ⚠HIT</span>`;
+    if (status === 'previously_visited')
+      return `<span style="font-size:8px;color:var(--cyan);font-weight:700;letter-spacing:0.06em;"> ↩VISITED</span>`;
+    return '';
+  };
+
+  const levelCell = (label, val, colorClass = '', histStatus = '') => {
     const display = fmtLevel(val);
     const copyable = display !== '—';
     return `<div class="level-cell">
-      <span class="level-lbl">${label}</span>
+      <span class="level-lbl">${label}${lhBadge(histStatus)}</span>
       <span class="level-val${colorClass ? ' ' + colorClass : ''}">${display}</span>
       ${copyable ? `<button class="level-copy" onclick="copyVal('${display}', this)" title="Copy">⎘</button>` : ''}
     </div>`;
@@ -2772,6 +3031,28 @@ function renderDetail(row, targetEl, tf) {
 
   } else {
     // Normal LONG / SHORT ticket
+    // FIX T4: build level history warning banner
+    const lhWarnings = [];
+    if (lh.stop === 'swept' || lh.stop === 'recently_swept') {
+      const ago = lh.stopSweepBarsAgo;
+      lhWarnings.push(`<li style="color:var(--green);"><b>✓ Stop zone was swept ${ago ? ago + ' bar(s) ago' : 'recently'}</b> — liquidity at that level is cleared. This <em>strengthens</em> the setup (smart money already hunted stops there).</li>`);
+    }
+    if (lh.tp1 === 'already_hit') {
+      const ago = lh.tp1HitBarsAgo;
+      lhWarnings.push(`<li style="color:var(--gold);"><b>⚠ TP1 zone (${fmtLevel(trade.tp1)}) was already reached ${ago ? ago + ' bar(s) ago' : 'recently'}</b> — first target is less reliable. Consider using TP2 as primary target or wait for retest.</li>`);
+    }
+    if (lh.tp2 === 'already_hit') {
+      lhWarnings.push(`<li style="color:var(--red);"><b>⚠ TP2 already hit</b> — setup may be extended. Reassess risk/reward before entry.</li>`);
+    }
+    if (lh.entry === 'previously_visited') {
+      lhWarnings.push(`<li style="color:var(--cyan);"><b>↩ Entry zone was previously visited</b> — price has been through this zone before. Watch for accumulation/distribution pattern.</li>`);
+    }
+    const lhBannerHtml = lhWarnings.length ? `
+      <div style="padding:10px 13px; border-bottom:1px solid var(--border); background:rgba(0,0,0,0.2);">
+        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--sub);margin-bottom:7px;">◈ Level History Audit</div>
+        <ul style="list-style:none;font-size:11px;line-height:1.8;padding:0;">${lhWarnings.join('')}</ul>
+      </div>` : '';
+
     executionSection = `
     <div class="ticket">
       <div class="ticket-head">
@@ -2782,12 +3063,13 @@ function renderDetail(row, targetEl, tf) {
         <span class="badge ${sideClass}">${dirWord.toUpperCase()}</span>
       </div>
       <div class="levels-grid" style="gap:1px; background:var(--border);">
-        ${levelCell('Entry Zone', trade.entry)}
-        ${levelCell('Stop Loss', trade.stop, 'down')}
-        ${levelCell('TP1 First', trade.tp1, 'up')}
-        ${levelCell('TP2 Expand', trade.tp2, 'up')}
-        ${levelCell('TP3 Runner', trade.tp3, 'up')}
+        ${levelCell('Entry Zone', trade.entry, '', lh.entry)}
+        ${levelCell('Stop Loss',  trade.stop,  'down', lh.stop)}
+        ${levelCell('TP1 First',  trade.tp1,   'up',   lh.tp1)}
+        ${levelCell('TP2 Expand', trade.tp2,   'up',   lh.tp2)}
+        ${levelCell('TP3 Runner', trade.tp3,   'up')}
       </div>
+      ${lhBannerHtml}
       <div class="ticket-notes" style="gap:1px; background:var(--border);">
         <div class="ticket-col">
           <ul class="ticket-list">
@@ -2809,6 +3091,65 @@ function renderDetail(row, targetEl, tf) {
     </div>`;
   }
 
+  /* ══ FIX T2: Build SMC Structure Levels block ══ */
+  const smcLevelRows = [];
+  if (primary.mss) {
+    smcLevelRows.push({ lbl: primary.mss.label + ' Pivot', val: primary.mss.direction === 'Bullish' ? primary.prevHigh.price : primary.prevLow.price, color: primary.mss.direction === 'Bullish' ? 'var(--green)' : 'var(--red)', note: primary.mss.trigger });
+  }
+  if (primary.choch) {
+    smcLevelRows.push({ lbl: primary.choch.label + ' Level', val: primary.choch.level, color: primary.choch.direction === 'Bullish' ? 'var(--green)' : 'var(--red)', note: primary.choch.trigger });
+  }
+  if (primary.bos) {
+    smcLevelRows.push({ lbl: primary.bos.label + ' Level', val: primary.bos.level, color: primary.bos.direction === 'Bullish' ? 'var(--green)' : 'var(--red)', note: 'Close through this level = structure continuation' });
+  }
+  smcLevelRows.push({ lbl: 'Prev Swing High', val: primary.prevHigh.price, color: 'var(--cyan)',  note: 'Prior swing high — BOS/CHoCH trigger above this' });
+  smcLevelRows.push({ lbl: 'Prev Swing Low',  val: primary.prevLow.price,  color: 'var(--gold)', note: 'Prior swing low — BOS/CHoCH trigger below this' });
+  smcLevelRows.push({ lbl: 'BSL (Swing High)', val: primary.recentHigh.price, color: 'var(--cyan)',  note: 'Buy-side liquidity — most recent swing high' });
+  smcLevelRows.push({ lbl: 'SSL (Swing Low)',  val: primary.recentLow.price,  color: 'var(--gold)', note: 'Sell-side liquidity — most recent swing low' });
+
+  const smcLevelsSection = `
+    <div style="border:1px solid var(--border); background:var(--bg3); overflow:hidden; margin-top:0;">
+      <div style="padding:8px 13px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between;">
+        <span style="font-family:'Syne',sans-serif;font-weight:700;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--sub);">◈ SMC Structure Levels</span>
+        <span style="font-size:9px;color:var(--muted);">All prices are exact pivot values</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);">
+        ${smcLevelRows.map(r => `
+          <div style="background:var(--bg2);padding:8px 10px;" title="${r.note}">
+            <span style="font-family:'Syne',sans-serif;font-size:8px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:3px;">${r.lbl}</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:${r.color};">${fmtPrice(r.val)}</span>
+          </div>`).join('')}
+      </div>
+    </div>`;
+
+  /* ══ FIX T3: Build Candlestick Patterns block ══ */
+  const patterns = primary.candlePatterns || [];
+  const patternSection = patterns.length > 0 ? `
+    <div style="border:1px solid var(--border); background:var(--bg3); overflow:hidden;">
+      <div style="padding:8px 13px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between;">
+        <span style="font-family:'Syne',sans-serif;font-weight:700;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--sub);">◈ Candlestick Patterns</span>
+        <span style="font-size:9px;color:var(--muted);">Last 3 candles · strength 1–3</span>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:1px;background:var(--border);">
+        ${patterns.map(p => {
+          const col = p.direction === 'Bullish' ? 'var(--green)' : p.direction === 'Bearish' ? 'var(--red)' : 'var(--gold)';
+          const bg  = p.direction === 'Bullish' ? 'rgba(0,230,118,0.06)' : p.direction === 'Bearish' ? 'rgba(255,68,68,0.06)' : 'rgba(255,213,79,0.06)';
+          const dots = '●'.repeat(p.strength) + '○'.repeat(3 - p.strength);
+          return `<div style="background:${bg};padding:8px 12px;flex:1;min-width:120px;">
+            <span style="font-family:'Syne',sans-serif;font-size:9px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:${col};display:block;">${p.name}</span>
+            <span style="font-size:9px;color:var(--muted);letter-spacing:0.04em;">${p.direction} &nbsp; ${dots}</span>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>` : '';
+
+  /* ══ FIX T5: Weekly TF label in HTF line ══ */
+  const htfLine = higher.map(a => {
+    const isWeekly = a.interval === '1w';
+    const col = a.bias === 'Bullish' ? 'var(--green)' : a.bias === 'Bearish' ? 'var(--red)' : 'var(--muted)';
+    return `<span style="color:${col};font-weight:${isWeekly ? '700' : '400'};">${a.interval.toUpperCase()} <b>${a.bias}</b>${a._insufficient ? ' <span style="color:var(--muted);font-size:9px;">(limited data)</span>' : ''}</span>`;
+  }).join(' &nbsp;/&nbsp; ');
+
   targetEl.innerHTML = `
     <div class="detail-meta">
       <div class="score-ring-wrap" title="Confluence score: ${trade.score}/95">
@@ -2829,14 +3170,15 @@ function renderDetail(row, targetEl, tf) {
           ${primary.trend} &nbsp;·&nbsp; ${primary.structureEvent}
         </div>
         <div class="price-sub" style="margin-top:3px;">
-          MTF: <b style="color:var(--text)">${trade.mtfBias}</b> &nbsp;·&nbsp;
-          HTF: ${higher.map(a => a.interval + ' ' + a.bias).join(' / ')}
+          MTF: <b style="color:var(--text)">${trade.mtfBias}</b> &nbsp;·&nbsp; ${htfLine}
         </div>
         ${trade.side === 'WAIT' ? `<div class="price-sub" style="margin-top:4px;"><span style="color:var(--gold)">⚠ Monitoring — see execution plan below.</span></div>` : ''}
       </div>
     </div>
 
     ${executionSection}
+
+    ${smcLevelsSection}
 
     <div class="data-cards">
       <div class="data-card"><span class="dc-lbl">Funding Rate</span><span class="dc-val ${row.funding < 0 ? 'up' : 'down'}">${fmtPct(row.funding, 4)}</span></div>
@@ -2848,6 +3190,8 @@ function renderDetail(row, targetEl, tf) {
       <div class="data-card"><span class="dc-lbl">BSL (Resistance)</span><span class="dc-val">${fmtPrice(primary.recentHigh.price)}</span></div>
       <div class="data-card"><span class="dc-lbl">SSL (Support)</span><span class="dc-val">${fmtPrice(primary.recentLow.price)}</span></div>
     </div>
+
+    ${patternSection}
 
     <div class="chart-wrap">
       ${renderChart(candles, primary, trade, false)}
@@ -2870,6 +3214,7 @@ function renderDetail(row, targetEl, tf) {
             <li>Prefer limit execution inside the entry zone after confirmation.</li>
             <li>${trade.invalidation}</li>
             <li>Reduce size when funding, OI, and structure disagree.</li>
+            ${patterns.length > 0 ? `<li>Pattern confluence: ${patterns.map(p => p.name + ' (' + p.direction + ')').join(', ')}.</li>` : ''}
           </ul>
         </div>
       </div>
@@ -3056,7 +3401,9 @@ async function runSingleScan() {
     const analyses   = candleSets.map((candles, i) => { const an = analyzeStructure(candles, intervals[i]); an.interval = intervals[i]; an.candles = candles; return an; });
     const primary    = analyses[0];
     const trade      = deriveTrade(row, primary, analyses.slice(1), tf);
-    row.analysis     = { primary, higher: analyses.slice(1), trade, candles: candleSets[0] };
+    // FIX T4: level history validation for single coin
+    const levelHistory = checkLevelHistory(candleSets[0], trade);
+    row.analysis     = { primary, higher: analyses.slice(1), trade, candles: candleSets[0], levelHistory };
     row.score        = trade.score;
     row.side         = trade.side;
     row.bias         = primary.bias;
@@ -3131,7 +3478,7 @@ async function runEmaScan() {
       symbols = (Array.isArray(tickers) ? tickers : [])
         .filter(i => i.symbol && !i.symbol.includes('_'))
         .filter(i => quoteFilter === 'ALL' || i.symbol.endsWith(quoteFilter))
-        .filter(i => Number(i.quoteVolume) > 50000000)
+        .filter(i => Number(i.quoteVolume) > 1000000) // FIX T1: was $50M — now $1M so full market really scans all liquid coins
         .sort((a,b) => Number(b.quoteVolume) - Number(a.quoteVolume))
         .map(i => i.symbol);
     } catch(e) {
@@ -3139,7 +3486,7 @@ async function runEmaScan() {
       const bybitTickers = await safeJson(_EP.by + '/tickers?category=linear', { result: { list: [] } });
       symbols = (bybitTickers?.result?.list || [])
         .filter(i => quoteFilter === 'ALL' || normalizeSymbol(i.symbol).endsWith(quoteFilter))
-        .filter(i => Number(i.turnover24h || 0) > 50000000)
+        .filter(i => Number(i.turnover24h || 0) > 1000000) // FIX T1: was $50M — now $1M
         .sort((a,b) => Number(b.turnover24h) - Number(a.turnover24h))
         .map(i => normalizeSymbol(i.symbol));
     }
