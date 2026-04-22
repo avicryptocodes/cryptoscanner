@@ -2716,15 +2716,15 @@ async function scanMarket() {
 
   await nextPaint();
   try {
-    setProgress('Fetching derivatives universe', 0, 0, '', 5);
+    setProgress('Building symbol universe', 0, 0, '', 5);
     let rows = await fetchMarket();
     if (!rows.length) throw new Error('No symbols matched the filter.');
 
     let oiDone = 0;
-    setProgress('Fetching OI and positioning', 0, rows.length, '', 10);
+    setProgress('Pre-fetching market data', 0, rows.length, '', 10);
     await hydrateOpenInterest(rows, chunk => {
       oiDone += chunk.length;
-      setProgress('Fetching OI and positioning', oiDone, rows.length, '', 10 + (oiDone / Math.max(rows.length, 1)) * 20);
+      setProgress('Pre-fetching market data', oiDone, rows.length, '', 10 + (oiDone / Math.max(rows.length, 1)) * 20);
     });
 
     setProgress('Analyzing chart structures', 0, rows.length, '', 30);
@@ -2948,7 +2948,7 @@ function renderDetail(row, targetEl, tf) {
       missingItems.push('Market structure is in <b>equilibrium / range</b> on the selected timeframe');
     }
 
-    if (derivativesRule && derivativesRule.skip) {
+    if (trade.derivativesRule && trade.derivativesRule.skip) {
       missingItems.push('Derivatives filter: <b>' + trade.derivativesRule.scenario + '</b> — manipulation risk flagged');
     }
 
