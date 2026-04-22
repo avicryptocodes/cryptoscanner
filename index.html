@@ -1458,7 +1458,17 @@
       <div class="single-result" id="singleResult">
         <div class="single-result-head">
           <span id="singleResultTitle" style="font-family:'Syne',sans-serif; font-weight:700; font-size:13px; color:var(--text);">—</span>
-          <span style="font-size:10px; color:var(--muted);">Single Coin Analysis</span>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <button id="singleExportBtn" onclick="exportSignal()" style="display:none;
+              font-family:'Syne',sans-serif; font-weight:700; font-size:10px;
+              letter-spacing:0.08em; text-transform:uppercase;
+              padding:5px 11px; border:1px solid var(--green-b);
+              color:var(--green); background:var(--green-dim);
+              transition:background 150ms;">
+              📋 Copy Signal
+            </button>
+            <span style="font-size:10px; color:var(--muted);">Single Coin Analysis</span>
+          </div>
         </div>
         <div id="singleDetail" class="detail-inner"></div>
       </div>
@@ -1567,7 +1577,17 @@
       <span class="drawer-symbol" id="drawerSymbol">—</span>
       <div id="drawerTags" style="display:flex; gap:6px; flex-wrap:wrap;"></div>
     </div>
-    <button class="drawer-close" onclick="closeDrawer()">✕</button>
+    <div style="display:flex; align-items:center; gap:8px; flex-shrink:0;">
+      <button id="drawerExportBtn" onclick="exportSignal()" style="display:none;
+        font-family:'Syne',sans-serif; font-weight:700; font-size:10px;
+        letter-spacing:0.08em; text-transform:uppercase;
+        padding:6px 12px; border:1px solid var(--green-b);
+        color:var(--green); background:var(--green-dim);
+        transition:background 150ms, border-color 150ms;">
+        📋 Copy Signal
+      </button>
+      <button class="drawer-close" onclick="closeDrawer()">✕</button>
+    </div>
   </div>
   <div class="drawer-body">
     <div id="drawerDetail" class="detail-inner"></div>
@@ -1629,6 +1649,7 @@ const el = {
   drawerSymbol:    document.getElementById('drawerSymbol'),
   drawerTags:      document.getElementById('drawerTags'),
   drawerDetail:    document.getElementById('drawerDetail'),
+  drawerExportBtn: document.getElementById('drawerExportBtn'),
   chartModal:      document.getElementById('chartModal'),
   modalTitle:      document.getElementById('modalTitle'),
   modalClose:      document.getElementById('modalClose'),
@@ -1659,6 +1680,7 @@ const el = {
   singleProgress:  document.getElementById('singleProgress'),
   singleError:     document.getElementById('singleError'),
   singleResult:    document.getElementById('singleResult'),
+  singleExportBtn: document.getElementById('singleExportBtn'),
   singleResultTitle: document.getElementById('singleResultTitle'),
   singleDetail:    document.getElementById('singleDetail'),
   // EMA Watch tab
@@ -1836,6 +1858,8 @@ function openDrawer(row) {
     `<span class="badge b-info">MTF: ${trade.mtfBias}</span>` +
     (row.analysis.primary.smcEvent ? `<span class="badge ${row.analysis.primary.smcEvent.type === 'MSS' ? 'b-sell' : row.analysis.primary.smcEvent.direction === 'Bullish' ? 'b-buy' : 'b-sell'}" style="font-size:9px;">${row.analysis.primary.smcEvent.label}</span>` : '');
   renderDetail(row, el.drawerDetail, tf);
+  // Show export button only for LONG/SHORT setups
+  el.drawerExportBtn.style.display = (trade.side === 'LONG' || trade.side === 'SHORT') ? 'inline-flex' : 'none';
   el.drawer.classList.add('open');
   el.drawerBackdrop.classList.add('open');
   document.body.style.overflow = 'hidden';
@@ -2528,7 +2552,7 @@ function deriveTrade(row, primary, higherAnalyses, tf) {
   const patternScore = alignedPatterns.reduce((s, p) => s + p.strength, 0);
   score += Math.min(patternScore * 3, 12); // cap pattern bonus at +12
 
-  score = clamp(Math.round(score), 0, 95);
+  score = clamp(Math.round(score / 1.3), 0, 100);
 
   const reasons = [
     'Derivatives rule: ' + derivativesRule.scenario + ' = ' + derivativesRule.interpretation + ' | Trade chance: ' + derivativesRule.tradeChance,
@@ -2914,9 +2938,9 @@ function renderDetail(row, targetEl, tf) {
       ? 'Invalid if price accepts above the stop zone and buy-side liquidity.'
       : 'No active risk plan until a directional setup appears.';
 
-  // SVG score ring
+  // SVG score ring (score is now /100)
   const radius = 28, circ = 2 * Math.PI * radius;
-  const arc = clamp((trade.score / 95) * circ, 0, circ);
+  const arc = clamp((trade.score / 100) * circ, 0, circ);
   const ringColor = trade.score >= 65 ? '#00e676' : trade.score >= 45 ? '#ffd54f' : '#5a6470';
 
   // Build the execution plan section
@@ -3154,7 +3178,7 @@ function renderDetail(row, targetEl, tf) {
 
   targetEl.innerHTML = `
     <div class="detail-meta">
-      <div class="score-ring-wrap" title="Confluence score: ${trade.score}/95">
+      <div class="score-ring-wrap" title="Confluence score: ${trade.score}/100">
         <svg viewBox="0 0 72 72">
           <circle cx="36" cy="36" r="${radius}" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="7"/>
           <circle cx="36" cy="36" r="${radius}" fill="none" stroke="${ringColor}" stroke-width="7"
@@ -3240,6 +3264,147 @@ function copyVal(val, btn) {
     btn.style.color = 'var(--green)';
     setTimeout(() => { btn.textContent = orig; btn.style.color = ''; }, 1200);
   }).catch(() => {});
+}
+
+/* ══════════════════════════════════════
+   SIGNAL EXPORT — builds plain-text signal
+   for Telegram / WhatsApp paste
+══════════════════════════════════════ */
+function buildSignalText(row, tf) {
+  const { primary, higher, trade, levelHistory } = row.analysis;
+  const lh = levelHistory || {};
+  const resolvedTf = tf || row._scanTf || el.timeframe.value;
+  const tfLabel = tfMap[resolvedTf]?.label || resolvedTf.toUpperCase();
+  const sideEmoji = trade.side === 'LONG' ? '📈' : '📉';
+  const divider = '━━━━━━━━━━━━━━━━━━━━━━━━━━';
+  const thin    = '─────────────────────────';
+
+  // Structure level values
+  const smcLine = primary.mss
+    ? `🔸 ${primary.mss.label} Pivot:   ${fmtPrice(primary.mss.direction === 'Bullish' ? primary.prevHigh.price : primary.prevLow.price)}`
+    : primary.choch
+      ? `🔸 ${primary.choch.label} Level: ${fmtPrice(primary.choch.level)}`
+      : primary.bos
+        ? `🔸 ${primary.bos.label} Level:  ${fmtPrice(primary.bos.level)}`
+        : '';
+
+  // Level history lines
+  const lhLines = [];
+  if (lh.stop === 'swept' || lh.stop === 'recently_swept') {
+    lhLines.push(`✅ Stop zone swept ${lh.stopSweepBarsAgo ? lh.stopSweepBarsAgo + ' bar(s) ago' : 'recently'} — liquidity cleared`);
+  }
+  if (lh.tp1 === 'already_hit') {
+    lhLines.push(`⚠️ TP1 already reached ${lh.tp1HitBarsAgo ? lh.tp1HitBarsAgo + ' bar(s) ago' : 'recently'} — consider TP2 as primary target`);
+  }
+  if (lh.tp2 === 'already_hit') {
+    lhLines.push(`⚠️ TP2 already hit — reassess risk/reward before entry`);
+  }
+  if (lh.entry === 'previously_visited') {
+    lhLines.push(`↩ Entry zone previously visited — watch for retest confirmation`);
+  }
+
+  // Confluence bullets — clean up HTML tags
+  const cleanReasons = trade.reasons
+    .filter(r => !r.startsWith('Derivatives logic:')) // skip verbose line
+    .map(r => r.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim())
+    .filter(r => r.length > 0)
+    .map(r => `• ${r}`);
+
+  // Patterns
+  const pats = primary.candlePatterns || [];
+  const bullPats = pats.filter(p => p.direction === 'Bullish').map(p => p.name);
+  const bearPats = pats.filter(p => p.direction === 'Bearish').map(p => p.name);
+  const patLine = bullPats.length ? `• Bullish pattern(s): ${bullPats.join(', ')}`
+    : bearPats.length ? `• Bearish pattern(s): ${bearPats.join(', ')}` : '';
+
+  // HTF line
+  const htfText = higher.map(a => `${a.interval.toUpperCase()} ${a.bias}`).join(' · ');
+
+  // FVG
+  const fvgLine = primary.fvg
+    ? `🔸 FVG (${primary.fvg.side}): ${fmtPrice(primary.fvg.low)} – ${fmtPrice(primary.fvg.high)}`
+    : '';
+
+  const lines = [
+    divider,
+    `📡 ATL SCANNER SIGNAL`,
+    divider,
+    `🪙 ${row.symbol}  |  ${tfLabel}  |  Score: ${trade.score}/100`,
+    `${sideEmoji} SIGNAL: ${trade.side}`,
+    `📊 Trend: ${primary.trend}  |  ${primary.structureEvent}`,
+    ``,
+    `━━━ EXECUTION PLAN ━━━`,
+    `${trade.side === 'LONG' ? '🟢' : '🔴'} Entry Zone:    ${fmtPrice(trade.entry)}`,
+    `🛑 Stop Loss:     ${fmtPrice(trade.stop)}`,
+    `🎯 TP1 (First):   ${fmtPrice(trade.tp1)}`,
+    `🎯 TP2 (Expand):  ${fmtPrice(trade.tp2)}`,
+    `🎯 TP3 (Runner):  ${fmtPrice(trade.tp3)}`,
+    `⚖️ R:R (TP2):     ${trade.rr ? trade.rr.toFixed(2) + 'R' : '—'}`,
+    ``,
+    `━━━ STRUCTURE ━━━`,
+    ...(smcLine ? [smcLine] : []),
+    `🔸 Prev Swing Hi: ${fmtPrice(primary.prevHigh.price)}`,
+    `🔸 Prev Swing Lo: ${fmtPrice(primary.prevLow.price)}`,
+    `🔸 BSL:           ${fmtPrice(primary.recentHigh.price)}`,
+    `🔸 SSL:           ${fmtPrice(primary.recentLow.price)}`,
+    ...(fvgLine ? [fvgLine] : []),
+    ``,
+    ...(lhLines.length ? [`━━━ LEVEL HISTORY ━━━`, ...lhLines, ``] : []),
+    `━━━ DERIVATIVES ━━━`,
+    `📈 Funding:   ${fmtPct(row.funding, 4)}`,
+    `📊 OI:        ${fmtMoney(row.openInterest)}  ${row.oiChange >= 0 ? '+' : ''}${(row.oiChange * 100).toFixed(2)}%`,
+    `👥 L/S Ratio: ${row.longShortRatio ? row.longShortRatio.toFixed(2) : '—'}`,
+    `💰 Volume:    ${fmtMoney(row.volume)}`,
+    ``,
+    `━━━ CONFLUENCE ━━━`,
+    `• MTF Bias: ${trade.mtfBias}  |  HTF: ${htfText}`,
+    ...cleanReasons.slice(0, 5), // cap at 5 bullets to keep it readable
+    ...(patLine ? [patLine] : []),
+    ``,
+    `━━━ INVALIDATION ━━━`,
+    `❌ ${trade.invalidation}`,
+    ``,
+    `⚠️ Not financial advice. Validate before trading.`,
+    `Powered by ATL · AlphaTradersLabs`,
+    divider,
+  ];
+
+  return lines.join('\n');
+}
+
+function exportSignal() {
+  // Find the active row — either drawer (market scan) or single coin
+  let row = null;
+  let tf  = null;
+
+  if (state.selected) {
+    row = state.rows.find(r => r.symbol === state.selected);
+    tf  = row?._scanTf || el.timeframe.value;
+  }
+  if (!row && state._singleRow) {
+    row = state._singleRow;
+    tf  = row._scanTf || el.singleTf.value;
+  }
+
+  if (!row?.analysis) return;
+  if (row.analysis.trade.side === 'WAIT') return; // no export for WAIT
+
+  const text = buildSignalText(row, tf);
+
+  // Copy to clipboard
+  navigator.clipboard?.writeText(text).then(() => {
+    // Visual feedback on whichever button is visible
+    const btns = [el.drawerExportBtn, el.singleExportBtn].filter(b => b && b.style.display !== 'none');
+    btns.forEach(btn => {
+      const orig = btn.innerHTML;
+      btn.innerHTML = '✓ Copied!';
+      btn.style.background = 'var(--green-b)';
+      setTimeout(() => { btn.innerHTML = orig; btn.style.background = ''; }, 2000);
+    });
+  }).catch(() => {
+    // Fallback: show text in a prompt so user can copy manually
+    window.prompt('Copy the signal below:', text);
+  });
 }
 
 /* ══════════════════════════════════════
@@ -3416,9 +3581,11 @@ async function runSingleScan() {
     state._singleRow    = row;
     state._singleSymbol = symbol;
 
-    el.singleResultTitle.textContent = symbol + ' · ' + config.label + ' · Score ' + trade.score;
+    el.singleResultTitle.textContent = symbol + ' · ' + config.label + ' · Score ' + trade.score + '/100';
     hideSingleProgress();
     el.singleResult.classList.add('active');
+    // Show export button only for LONG/SHORT
+    el.singleExportBtn.style.display = (trade.side === 'LONG' || trade.side === 'SHORT') ? 'inline-flex' : 'none';
     renderDetail(row, el.singleDetail, tf);
 
   } catch(e) {
