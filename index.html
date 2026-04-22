@@ -107,8 +107,23 @@
     #lastScan.stale-crit { color: var(--red); }
 
     /* ══════════════════════════════════════
-       TABS
+       TABS  — each tab has its own color
+       Market Scan  → cyan   (#40c4ff)
+       Single Coin  → gold   (#ffd54f)
+       EMA Watch    → violet (#c87eff)
     ══════════════════════════════════════ */
+    :root {
+      --tab-market: #40c4ff;
+      --tab-market-dim: rgba(64,196,255,0.10);
+      --tab-market-b:   rgba(64,196,255,0.22);
+      --tab-single: #ffd54f;
+      --tab-single-dim: rgba(255,213,79,0.10);
+      --tab-single-b:   rgba(255,213,79,0.22);
+      --tab-ema:    #c87eff;
+      --tab-ema-dim:    rgba(200,126,255,0.10);
+      --tab-ema-b:      rgba(200,126,255,0.22);
+    }
+
     .tabs-bar {
       position: fixed;
       top: var(--nav-h); left: 0; right: 0;
@@ -121,29 +136,87 @@
 
     .tab-btn {
       flex: 1;
-      display: flex; align-items: center; justify-content: center; gap: 8px;
+      display: flex; align-items: center; justify-content: center; gap: 7px;
       font-family: 'Syne', sans-serif;
-      font-weight: 700; font-size: 12px;
-      letter-spacing: 0.08em; text-transform: uppercase;
+      font-weight: 700; font-size: 11px;
+      letter-spacing: 0.07em; text-transform: uppercase;
       color: var(--muted);
       border-bottom: 2px solid transparent;
-      transition: color 150ms, border-color 150ms;
-      padding: 0 16px;
+      border-right: 1px solid var(--border);
+      transition: color 150ms, border-color 150ms, background 150ms;
+      padding: 0 12px;
       position: relative;
+      cursor: pointer;
     }
-    .tab-btn.active { color: var(--text); border-bottom-color: var(--green); }
-    .tab-btn:hover:not(.active) { color: var(--sub); }
+    .tab-btn:last-child { border-right: none; }
 
+    /* Tab icon */
+    .tab-icon {
+      font-size: 13px;
+      opacity: 0.5;
+      transition: opacity 150ms, transform 150ms;
+      flex-shrink: 0;
+    }
+
+    /* ── Market Scan (cyan) ── */
+    .tab-btn[data-tab="market"]:hover:not(.active) {
+      color: var(--tab-market);
+      background: var(--tab-market-dim);
+    }
+    .tab-btn[data-tab="market"]:hover:not(.active) .tab-icon { opacity: 0.8; }
+    .tab-btn[data-tab="market"].active {
+      color: var(--tab-market);
+      border-bottom-color: var(--tab-market);
+      background: var(--tab-market-dim);
+    }
+    .tab-btn[data-tab="market"].active .tab-icon { opacity: 1; transform: scale(1.1); }
+
+    /* ── Single Coin (gold) ── */
+    .tab-btn[data-tab="single"]:hover:not(.active) {
+      color: var(--tab-single);
+      background: var(--tab-single-dim);
+    }
+    .tab-btn[data-tab="single"]:hover:not(.active) .tab-icon { opacity: 0.8; }
+    .tab-btn[data-tab="single"].active {
+      color: var(--tab-single);
+      border-bottom-color: var(--tab-single);
+      background: var(--tab-single-dim);
+    }
+    .tab-btn[data-tab="single"].active .tab-icon { opacity: 1; transform: scale(1.1); }
+
+    /* ── EMA Watch (violet) ── */
+    .tab-btn[data-tab="ema"]:hover:not(.active) {
+      color: var(--tab-ema);
+      background: var(--tab-ema-dim);
+    }
+    .tab-btn[data-tab="ema"]:hover:not(.active) .tab-icon { opacity: 0.8; }
+    .tab-btn[data-tab="ema"].active {
+      color: var(--tab-ema);
+      border-bottom-color: var(--tab-ema);
+      background: var(--tab-ema-dim);
+    }
+    .tab-btn[data-tab="ema"].active .tab-icon { opacity: 1; transform: scale(1.1); }
+
+    /* Tab count badge — inherits tab color */
     .tab-count {
       font-family: 'JetBrains Mono', monospace;
-      font-weight: 600; font-size: 10px;
+      font-weight: 700; font-size: 9px;
       padding: 2px 6px;
-      background: var(--green-dim);
-      border: 1px solid var(--green-b);
-      color: var(--green);
       display: none;
+      border: 1px solid;
+      line-height: 1.4;
     }
     .tab-count.show { display: inline-flex; }
+    .tab-btn[data-tab="market"] .tab-count {
+      color: var(--tab-market);
+      background: var(--tab-market-dim);
+      border-color: var(--tab-market-b);
+    }
+    .tab-btn[data-tab="ema"] .tab-count {
+      color: var(--tab-ema);
+      background: var(--tab-ema-dim);
+      border-color: var(--tab-ema-b);
+    }
 
     /* ══════════════════════════════════════
        PAGE BODY
@@ -1145,13 +1218,16 @@
 <!-- TABS -->
 <div class="tabs-bar">
   <button class="tab-btn active" data-tab="market" onclick="switchTab('market')">
+    <span class="tab-icon">⬡</span>
     Market Scan
     <span class="tab-count" id="scanCount">0</span>
   </button>
   <button class="tab-btn" data-tab="single" onclick="switchTab('single')">
+    <span class="tab-icon">◎</span>
     Single Coin
   </button>
   <button class="tab-btn" data-tab="ema" onclick="switchTab('ema')">
+    <span class="tab-icon">≋</span>
     EMA Watch
     <span class="tab-count" id="emaCount">0</span>
   </button>
