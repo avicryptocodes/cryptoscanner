@@ -2554,8 +2554,7 @@ function deriveTrade(row, primary, higherAnalyses, tf) {
   if (crowdLong)  reasons.push('Long-heavy crowd; watch for long liquidation traps');
   if (crowdShort) reasons.push('Short-heavy crowd; watch for short squeeze reversals');
 
-  // FIX T3: candlestick pattern reasons
-  const patterns = primary.candlePatterns || [];
+  // FIX T3: candlestick pattern reasons (reuse 'patterns' declared above)
   if (patterns.length > 0) {
     const bullPats  = patterns.filter(p => p.direction === 'Bullish').map(p => p.name);
     const bearPats  = patterns.filter(p => p.direction === 'Bearish').map(p => p.name);
